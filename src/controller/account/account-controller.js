@@ -3,25 +3,49 @@ const VerifyEmail = require('../../model/otp-verify-email-model')
 const ForgetPass = require('../../model/otp-forget-pass-model')
 const generateOtp = require('../../utils/generate-otp')
 const sendMail = require('../../mail/send-mail')
-const { sendUserAndJWT } = require('../../utils/account')
+const jwtToken = require('../../utils/jwt-token')
+const factory = require('./factory')
+const {
+  sendUserAndJWT,
+  getFindUserQuery,
+  createOrUpdateCode,
+} = require('../../utils/account')
 
-const getFindUserQuery = (email, username) => {
-  if (email && username) {
-    throw new ReqError('Email and Username cannot be present...')
+exports.checkUserMiddleware = async (req, res, next) => {
+  const [token] = req.headers.authorization?.match(/\S*$/)
+  const tokenInfo = jwtToken.verify(token)
+  const user = await User.findById(tokenInfo.id)
+
+  if (!user) {
+    throw new ReqError('User no longer exixts', 404)
   }
-  return email ? { email } : { username }
+  if (user.passwordChangedAfter(token.iat)) {
+    throw new ReqError('Your token is no longer valid')
+  }
+
+  req.user = user
+  next()
 }
 
-const createOrUpdateCode = async (doc, model, data) => {
-  if (doc) {
-    for (let key in data) doc[key] = data[key]
-    await doc.save()
-  } else {
-    await model.create(data)
-  }
+exports.checkPassAfterSignedinMiddleWare = async (req, res, next) => {
+  const ok = await req.user.checkPassword(req.body.password)
+  if (!ok) throw new ReqError('Wrong password')
+  next()
 }
 
-exports.verifyEmail = async (req, res) => {
+exports.verifyEmailCodeMiddleware = async (req, res, next) => {
+  const { email, code } = req.body
+  const verifyEmailRequest = await VerifyEmail.findOne({ email })
+  if (!verifyEmailRequest) {
+    throw new ReqError('User never requested for OTP', 400)
+  }
+  if (!(await verifyEmailRequest.checkCode(code))) {
+    throw new ReqError('Wrong information', 403)
+  }
+  next()
+}
+
+exports.requestEmailVerify = async (req, res) => {
   const { email } = req.body
 
   if (await User.findOne({ email })) {
@@ -36,16 +60,7 @@ exports.verifyEmail = async (req, res) => {
 }
 
 exports.signup = async (req, res) => {
-  const { name, email, username, image, password, code } = req.body
-
-  const verifyEmailRequest = await VerifyEmail.findOne({ email })
-  if (!verifyEmailRequest) {
-    throw new ReqError('User never requested for OTP', 400)
-  }
-  if (!(await verifyEmailRequest.checkCode(code))) {
-    throw new ReqError('Wrong information', 403)
-  }
-
+  const { name, email, username, image, password } = req.body
   const user = await User.create({ name, email, username, image, password })
   await verifyEmailRequest.delete()
   sendUserAndJWT(res, user)
@@ -59,7 +74,7 @@ exports.login = async (req, res) => {
 
   const user = await User.findOne(getFindUserQuery(email, username))
   if (!user || !(await user.checkPassword(password))) {
-    throw new ReqError('Hehhee')
+    throw new ReqError('Email or password is wrong')
   }
 
   sendUserAndJWT(res, user)
@@ -101,3 +116,16 @@ exports.resetPassword = async (req, res) => {
   await forgetPassRequest.delete()
   sendUserAndJWT(res, user)
 }
+
+exports.changePassword = async (req, res) => {
+  const { password, new_password } = req.body
+
+  if (password !== new_password) {
+    req.user.password = new_password
+    await req.user.save()
+    sendUserAndJWT(res, req.user._id)
+  } else throw new ReqError('You have entered the previous password')
+}
+
+exports.changeEmail = factory.changeEmailAndUsername('email')
+exports.changeUsername = factory.changeEmailAndUsername('username')

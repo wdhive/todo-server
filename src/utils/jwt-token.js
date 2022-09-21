@@ -7,7 +7,12 @@ exports.generate = id => {
 }
 
 exports.verify = token => {
-  return jsonwebtoken.verify(token, process.env.JWT_SECRET)
+  const tokenInfo = jsonwebtoken.verify(token, process.env.JWT_SECRET)
+  const currentTime = Math.floor(Date.now() / 1000)
+  if (tokenInfo.exp <= currentTime) {
+    throw new ReqError('Auth token has been expired')
+  }
+  return tokenInfo
 }
 
 exports.decode = token => {

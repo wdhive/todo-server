@@ -1,7 +1,9 @@
 const express = require('express')
-const crudTaskController = require('../controller/tasks/crud-task-controller')
 const router = express.Router()
-
-router.get('/', )
+const [crudTaskController, accountController] = ReqError.wrapper(
+  require('../controller/tasks/crud-task-controller'),
+  require('../controller/account/account-controller')
+)
+router.use(accountController.checkUserMiddleware)
 
 module.exports = router
