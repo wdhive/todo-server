@@ -1,26 +1,38 @@
 const express = require('express')
+const router = express.Router()
 const [userController, accountController] = ReqError.wrapper(
   require('../controller/account/user-controller'),
   require('../controller/account/account-controller')
 )
 
-const router = express.Router()
-
-router.post('/verify-email', accountController.verifyEmail)
-router.post('/signup', accountController.signup)
+router.post('/request-email-verify', accountController.requestEmailVerify)
+router.post(
+  '/signup',
+  accountController.verifyEmailCodeMiddleware,
+  accountController.signup
+)
 router.post('/login', accountController.login)
 router.post('/password-forget', accountController.forgetPassword)
 router.post('/password-reset', accountController.resetPassword)
 
-router.use(userController.checkUserMiddleware)
+// Now every request needs to be logged in
+router.use(accountController.checkUserMiddleware)
+
 router
   .route('/')
   .get(userController.getUser)
   .patch(userController.updateUser)
   .delete(userController.deleteUser)
 
-router.patch('/email', userController.changeEmail)
-router.patch('/password', userController.changePassword)
-router.patch('/username', userController.changeUsername)
+// Now every request needs to put his 'password' in the body
+router.use(accountController.checkPassAfterSignedinMiddleWare)
+
+router.patch('/change-password', accountController.changePassword)
+router.patch('/change-username', accountController.changeUsername)
+router.patch(
+  '/change-email',
+  accountController.verifyEmailCodeMiddleware,
+  accountController.changeEmail
+)
 
 module.exports = router

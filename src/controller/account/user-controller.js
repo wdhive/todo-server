@@ -1,15 +1,29 @@
-const User = require('../../model/user-model')
+exports.getUser = async (req, res) => {
+  res.success({ user: req.user.getSafeInfo() })
+}
 
-exports.checkUserMiddleware = async (req, res) => {}
+exports.updateUser = async (req, res) => {
+  let modified = false
+  const body = {
+    name: req.body.name,
+    image: req.body.image,
+  }
 
-exports.getUser = async (req, res) => {}
+  for (let key in body) {
+    const value = body[key]
+    if (value && value !== req.user[key]) {
+      req.user[key] = value
+      modified = true
+    }
+  }
 
-exports.updateUser = async (req, res) => {}
+  if (modified) req.user = await req.user.save()
+  res.success({ user: req.user.getSafeInfo() })
+}
 
-exports.deleteUser = async (req, res) => {}
+exports.deleteUser = async (req, res) => {
+  await req.user.delete()
+  // TODO: Delete all task that are only assinged to this user
 
-exports.changePassword = async (req, res) => {}
-
-exports.changeEmail = async (req, res) => {}
-
-exports.changeUsername = async (req, res) => {}
+  res.success(null, 204)
+}
