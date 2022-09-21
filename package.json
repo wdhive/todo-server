@@ -1,0 +1,22 @@
+{
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon . --NODE_ENV=development",
+    "debug": "ndb npm start",
+    "serve": "node ."
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "dependencies": {
+    "cors": "latest",
+    "helmet": "latest",
+    "dotenv": "latest",
+    "colors": "latest",
+    "express": "latest",
+    "mongoose": "latest",
+    "xss-clean": "latest",
+    "express-rate-limit": "latest",
+    "express-mongo-sanitize": "latest"
+  }
+}
