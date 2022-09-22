@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router()
-const [userController, accountController] = ReqError.wrapper(
+const [userController, accountController] = ReqError.catch(
   require('../controller/account/user-controller'),
   require('../controller/account/account-controller')
 )
