@@ -7,18 +7,18 @@ const userSchema = mongoose.Schema(
   {
     name: {
       type: String,
-      required: true,
+      required: [true, 'User must have a name'],
     },
     username: {
       type: String,
-      required: true,
-      unique: true,
+      required: [true, 'User must have a usrname'],
+      unique: [true, "The given username isn't available"],
       lowercase: true,
     },
     email: {
       type: String,
-      required: true,
-      unique: true,
+      required: [true, 'User must give an email'],
+      unique: [true, 'Another account already exists with this email'],
       lowercase: true,
     },
     image: {
