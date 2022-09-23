@@ -39,6 +39,21 @@ global.ReqError = class ReqError extends Error {
   name = 'RequestError'
   isOperational = true
   constructor(message, statusCode) {
+    if (message instanceof Array) {
+      statusCode ||= message[1]
+      message = message[0]
+    } else if (message instanceof Object) {
+      statusCode ||= message.statusCode
+      message = message.message
+    }
+
+    if (typeof message !== 'string') {
+      throw new DevError('RequestError constructor gets invalid message')
+    }
+    if (statusCode != null && typeof statusCode !== 'number') {
+      throw new DevError('RequestError constructor gets invalid statusCode')
+    }
+
     super(message)
     this.statusCode = statusCode
     Error.captureStackTrace(this, this.constructor)

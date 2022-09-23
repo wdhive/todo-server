@@ -1,4 +1,5 @@
 const colors = require('colors/safe')
+const errorMessages = require('../utils/error-messages')
 
 const errorHandler = {
   duplicateError: err => {
@@ -32,10 +33,10 @@ module.exports = err => {
 
   switch (err.name) {
     case 'JsonWebTokenError':
-      return ['Invalid auth token', 401]
+      return errorMessages.auth.invalid
 
     case 'TokenExpiredError':
-      return ['Auth token has been expired', 401]
+      return errorMessages.auth.jwtExpire
 
     case 'ObjectParameterError':
       return [errorHandler.objParamError(err), 400]

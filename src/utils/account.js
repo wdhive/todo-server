@@ -1,5 +1,6 @@
-const { default: mongoose } = require('mongoose')
+const mongoose = require('mongoose')
 const jwtToken = require('./jwt-token')
+const errorMessages = require('./error-messages')
 
 exports.sendUserAndJWT = (res, user) => {
   const userMode =
@@ -13,7 +14,7 @@ exports.sendUserAndJWT = (res, user) => {
 
 exports.getFindUserQuery = (email, username) => {
   if (email && username) {
-    throw new ReqError('Email and Username cannot be present...')
+    throw new ReqError(errorMessages.extra.findWithEmailAndPassword)
   }
   return email ? { email } : { username }
 }

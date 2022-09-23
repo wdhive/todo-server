@@ -2,23 +2,24 @@ const mongoose = require('mongoose')
 const bcrypt = require('bcrypt')
 const { getFeildsFromObject } = require('../utils')
 const { runOnFieldUpdate } = require('../utils/schema')
+const errorMessages = require('../utils/error-messages')
 
 const userSchema = mongoose.Schema(
   {
     name: {
       type: String,
-      required: [true, 'User must have a name'],
+      required: [true, errorMessages.name.fieldMissing[0]],
     },
     username: {
       type: String,
-      required: [true, 'User must have a usrname'],
-      unique: [true, "The given username isn't available"],
+      required: [true, errorMessages.username.fieldMissing[0]],
+      unique: [true, errorMessages.username.duplicate[0]],
       lowercase: true,
     },
     email: {
       type: String,
-      required: [true, 'User must give an email'],
-      unique: [true, 'Another account already exists with this email'],
+      required: [true, errorMessages.email.fieldMissing[0]],
+      unique: [true, errorMessages.email.duplicate[0]],
       lowercase: true,
     },
     image: {
@@ -26,7 +27,7 @@ const userSchema = mongoose.Schema(
     },
     password: {
       type: String,
-      required: [true, 'User must have a password'],
+      required: [true, errorMessages.password.fieldMissing[0]],
     },
     passwordModifiedAt: {
       type: Date,

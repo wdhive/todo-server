@@ -3,6 +3,7 @@ const VerifyEmail = require('../../model/otp-verify-email-model')
 const ForgetPass = require('../../model/otp-forget-pass-model')
 const generateOtp = require('../../utils/generate-otp')
 const sendMail = require('../../mail/send-mail')
+const errorMessages = require('../../utils/error-messages')
 const jwtToken = require('../../utils/jwt-token')
 const factory = require('./factory')
 const {
@@ -17,10 +18,10 @@ exports.checkUserMiddleware = async (req, res, next) => {
   const user = await User.findById(tokenInfo.id)
 
   if (!user) {
-    throw new ReqError('User no longer exixts', 404)
+    throw new ReqError(errorMessages.user.deleted)
   }
   if (user.passwordChangedAfter(token.iat)) {
-    throw new ReqError('Your token is no longer valid')
+    throw new ReqError(errorMessages.auth.jwtExpire)
   }
 
   req.user = user
@@ -29,7 +30,7 @@ exports.checkUserMiddleware = async (req, res, next) => {
 
 exports.checkPassAfterSignedinMiddleWare = async (req, res, next) => {
   const ok = await req.user.checkPassword(req.body.password)
-  if (!ok) throw new ReqError("The password you've entered is incorrect")
+  if (!ok) throw new ReqError(errorMessages.password.wrong)
   next()
 }
 
@@ -37,11 +38,12 @@ exports.verifyEmailCodeMiddleware = async (req, res, next) => {
   const { email, code } = req.body
   const verifyEmailRequest = await VerifyEmail.findOne({ email })
   if (!verifyEmailRequest) {
-    throw new ReqError('User never requested for OTP', 400)
+    throw new ReqError(errorMessages.otp.notExists)
   }
   if (!(await verifyEmailRequest.checkCode(code))) {
-    throw new ReqError('OTP did not match', 403)
+    throw new ReqError(errorMessages.otp.wrong)
   }
+  req.otpRequest = verifyEmailRequest
   next()
 }
 
@@ -49,7 +51,7 @@ exports.requestEmailVerify = async (req, res) => {
   const { email } = req.body
 
   if (await User.findOne({ email })) {
-    throw new ReqError('Another account is associated with this email', 400)
+    throw new ReqError(errorMessages.email.duplicate)
   }
 
   const existingRequest = await VerifyEmail.findOne({ email })
@@ -62,19 +64,19 @@ exports.requestEmailVerify = async (req, res) => {
 exports.signup = async (req, res) => {
   const { name, email, username, image, password } = req.body
   const user = await User.create({ name, email, username, image, password })
-  await verifyEmailRequest.delete()
+  await req.otpRequest.delete()
   sendUserAndJWT(res, user)
 }
 
 exports.login = async (req, res) => {
   const { email, username, password } = req.body
   if (!password) {
-    throw new ReqError("Didn't receive a password")
+    throw new ReqError(errorMessages.password.fieldMissing)
   }
 
   const user = await User.findOne(getFindUserQuery(email, username))
   if (!user || !(await user.checkPassword(password))) {
-    throw new ReqError('Login credentials are incorrect')
+    throw new ReqError(errorMessages.auth.failed)
   }
 
   sendUserAndJWT(res, user)
@@ -105,12 +107,13 @@ exports.forgetPassword = async (req, res) => {
 exports.resetPassword = async (req, res) => {
   const { email, username, code, new_password } = req.body
   const user = await User.findOne(getFindUserQuery(email, username))
-  if (!user) throw new ReqError('User could not be found', 403)
+  if (!user) throw new ReqError(errorMessages.user.notFound)
 
-  // FIXME: DRY
   const forgetPassRequest = await ForgetPass.findById(user._id)
-  if (!forgetPassRequest || !(await forgetPassRequest.checkCode(code)))
-    throw new ReqError('OTP did not match', 403)
+  if (!forgetPassRequest) throw new ReqError(errorMessages.otp.notExists)
+  if (!(await forgetPassRequest.checkCode(code))) {
+    throw new ReqError(errorMessages.otp.wrong)
+  }
 
   user.password = new_password
   await user.save()
@@ -125,10 +128,7 @@ exports.changePassword = async (req, res) => {
     req.user.password = new_password
     await req.user.save()
     sendUserAndJWT(res, req.user._id)
-  } else
-    throw new ReqError(
-      'This password was previously used. Please try with another one'
-    )
+  } else throw new ReqError(errorMessages.extra.enteredExistingInfo('password'))
 }
 
 exports.changeEmail = factory.changeEmailAndUsername('email')
