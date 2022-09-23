@@ -125,7 +125,10 @@ exports.changePassword = async (req, res) => {
     req.user.password = new_password
     await req.user.save()
     sendUserAndJWT(res, req.user._id)
-  } else throw new ReqError('This password was previously used. Please try with another one')
+  } else
+    throw new ReqError(
+      'This password was previously used. Please try with another one'
+    )
 }
 
 exports.changeEmail = factory.changeEmailAndUsername('email')
