@@ -6,8 +6,8 @@ const schema = mongoose.Schema(
   {
     email: {
       type: 'string',
-      required: [true, 'Please enter a valid email'],
-      unique: true,
+      required: [true, 'Did not receive an email. Please try again'],
+      unique: [true, 'An account is already associated with this email'],
     },
     code: {
       type: 'string',

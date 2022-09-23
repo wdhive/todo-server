@@ -13,7 +13,7 @@ module.exports = schema => {
     })
   )
   schema.methods.checkCode = function (code) {
-    if (!code) throw new ReqError('Invalid code', 400)
+    if (typeof code !== 'string') throw new ReqError('Invalid code', 400)
     return brcypt.compare(code, this.code)
   }
 }

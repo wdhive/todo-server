@@ -20,6 +20,7 @@
     "jsonwebtoken": "^8.5.1",
     "mongoose": "latest",
     "nodemailer": "^6.7.8",
+    "nodemon": "^2.0.20",
     "xss-clean": "latest"
   }
 }

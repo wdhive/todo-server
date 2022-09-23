@@ -29,7 +29,7 @@ exports.checkUserMiddleware = async (req, res, next) => {
 
 exports.checkPassAfterSignedinMiddleWare = async (req, res, next) => {
   const ok = await req.user.checkPassword(req.body.password)
-  if (!ok) throw new ReqError('Wrong password')
+  if (!ok) throw new ReqError("The password you've entered is incorrect")
   next()
 }
 
@@ -40,7 +40,7 @@ exports.verifyEmailCodeMiddleware = async (req, res, next) => {
     throw new ReqError('User never requested for OTP', 400)
   }
   if (!(await verifyEmailRequest.checkCode(code))) {
-    throw new ReqError('Wrong information', 403)
+    throw new ReqError('OTP did not match', 403)
   }
   next()
 }
@@ -49,7 +49,7 @@ exports.requestEmailVerify = async (req, res) => {
   const { email } = req.body
 
   if (await User.findOne({ email })) {
-    throw new ReqError('Another account associated with this email', 400)
+    throw new ReqError('Another account is associated with this email', 400)
   }
 
   const existingRequest = await VerifyEmail.findOne({ email })
@@ -69,12 +69,12 @@ exports.signup = async (req, res) => {
 exports.login = async (req, res) => {
   const { email, username, password } = req.body
   if (!password) {
-    throw new ReqError('Must need to provide a password')
+    throw new ReqError("Didn't receive a password")
   }
 
   const user = await User.findOne(getFindUserQuery(email, username))
   if (!user || !(await user.checkPassword(password))) {
-    throw new ReqError('Email or password is wrong')
+    throw new ReqError('Login credentials are incorrect')
   }
 
   sendUserAndJWT(res, user)
@@ -105,11 +105,12 @@ exports.forgetPassword = async (req, res) => {
 exports.resetPassword = async (req, res) => {
   const { email, username, code, new_password } = req.body
   const user = await User.findOne(getFindUserQuery(email, username))
-  if (!user) throw new ReqError('Wrong information', 403)
+  if (!user) throw new ReqError('User could not be found', 403)
 
+  // FIXME: DRY
   const forgetPassRequest = await ForgetPass.findById(user._id)
   if (!forgetPassRequest || !(await forgetPassRequest.checkCode(code)))
-    throw new ReqError('Wrong information', 403)
+    throw new ReqError('OTP did not match', 403)
 
   user.password = new_password
   await user.save()
@@ -124,7 +125,7 @@ exports.changePassword = async (req, res) => {
     req.user.password = new_password
     await req.user.save()
     sendUserAndJWT(res, req.user._id)
-  } else throw new ReqError('You have entered the previous password')
+  } else throw new ReqError('This password was previously used. Please try with another one')
 }
 
 exports.changeEmail = factory.changeEmailAndUsername('email')
