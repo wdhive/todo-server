@@ -11,9 +11,9 @@ const {
   sendUserAndJWT,
   getFindUserQuery,
   createOrUpdateCode,
-} = require('../../utils/account')
+} = require('./utils')
 
-exports.checkUserMiddleware = async (req, res, next) => {
+exports.checkAuthMiddleware = async (req, res, next) => {
   const [token] = req.headers.authorization?.match(/\S*$/)
   const tokenInfo = jwtToken.verify(token)
   const user = await User.findById(tokenInfo.id)
@@ -129,7 +129,7 @@ exports.changePassword = async (req, res) => {
     req.user.password = new_password
     await req.user.save()
 
-    socketStore.disconnectExceptFromReq(req)
+    socketStore.disconnectExceptReq(req) // Only when req.body has `socketId` field
     sendUserAndJWT(res, req.user._id)
   } else throw new ReqError(errorMessages.extra.enteredExistingInfo('password'))
 }
