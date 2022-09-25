@@ -6,6 +6,7 @@ const sendMail = require('../../mail/send-mail')
 const errorMessages = require('../../utils/error-messages')
 const jwtToken = require('../../utils/jwt-token')
 const factory = require('./factory')
+const socketStore = require('../../core/socket-store')
 const {
   sendUserAndJWT,
   getFindUserQuery,
@@ -127,6 +128,8 @@ exports.changePassword = async (req, res) => {
   if (password !== new_password) {
     req.user.password = new_password
     await req.user.save()
+
+    socketStore.disconnectExceptFromReq(req)
     sendUserAndJWT(res, req.user._id)
   } else throw new ReqError(errorMessages.extra.enteredExistingInfo('password'))
 }

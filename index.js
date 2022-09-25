@@ -19,4 +19,6 @@ if (process.argv.at(-1) === '--NODE_ENV=development') {
 process.env.PORT ||= 8000
 
 require('./src/core')
-require('./src/server')
+const io = require('./src/socket')
+const server = require('./src/server')
+io.attach(server)

@@ -21,6 +21,7 @@
     "mongoose": "latest",
     "nodemailer": "^6.7.8",
     "nodemon": "^2.0.20",
+    "socket.io": "^4.5.2",
     "xss-clean": "latest"
   }
 }

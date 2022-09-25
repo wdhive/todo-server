@@ -1,4 +1,5 @@
 const errorHandler = require('./error-handler')
+const jSend = require('./j-send')
 
 const respondErrorDevMode = (err, req, res, next) => {
   const [message, code] = errorHandler(err)
@@ -12,10 +13,7 @@ const respondErrorDevMode = (err, req, res, next) => {
 
 const respondErrorProdMode = (err, req, res, next) => {
   const [message, code] = errorHandler(err)
-  res.status(code).json({
-    status: code < 500 ? 'fail' : 'error',
-    message,
-  })
+  res.status(code).json(jSend.fail(code < 500 ? 'fail' : 'error', message))
 }
 
 exports.errorHandler =
@@ -28,8 +26,5 @@ exports.notFound = (req, res, next) => {
 }
 
 exports.success = function (data, code = 200) {
-  this.status(code).json({
-    status: 'success',
-    data,
-  })
+  this.status(code).json(jSend.success(data))
 }

@@ -1,8 +1,10 @@
+const http = require('http')
 const mongoose = require('mongoose')
 const colors = require('colors/safe')
 const app = require('./app')
 
-const server = app.listen(process.env.PORT, () => {
+const server = http.createServer(app)
+server.listen(process.env.PORT, () => {
   const [connectedPort] = server._connectionKey.match(/\d+$/)
   console.log(
     colors.brightGreen('>>>', `App running on port "${connectedPort}"...`)
