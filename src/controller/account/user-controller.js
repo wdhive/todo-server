@@ -1,3 +1,5 @@
+const socketStore = require('../../core/socket-store')
+
 exports.getUser = async (req, res) => {
   res.success({ user: req.user.getSafeInfo() })
 }
@@ -23,6 +25,7 @@ exports.updateUser = async (req, res) => {
 
 exports.deleteUser = async (req, res) => {
   await req.user.delete()
+  socketStore.disconnectAllFromReq(req)
   // TODO: Delete all task that are only assinged to this user
 
   res.success(null, 204)

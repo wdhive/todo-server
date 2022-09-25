@@ -1,4 +1,5 @@
 const brcypt = require('bcrypt')
+const errorMessages = require('./error-messages')
 const { runOnFieldUpdate } = require('./schema')
 
 module.exports = schema => {
@@ -13,7 +14,7 @@ module.exports = schema => {
     })
   )
   schema.methods.checkCode = function (code) {
-    if (!code) throw new ReqError('Invalid code', 400)
+    if (typeof code !== 'string') throw new ReqError(errorMessages.otp.invalid)
     return brcypt.compare(code, this.code)
   }
 }

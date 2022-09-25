@@ -1,13 +1,14 @@
 const mongoose = require('mongoose')
 const { VERIFY_EMAIL_EXPIRE_DURATION } = require('../config/config')
+const errorMessages = require('../utils/error-messages')
 const otpSchemaHelpers = require('../utils/otp-schema-helpers')
 
 const schema = mongoose.Schema(
   {
     email: {
       type: 'string',
-      required: [true, 'Please enter a valid email'],
-      unique: true,
+      required: [true, errorMessages.email.fieldMissing[0]],
+      unique: [true, errorMessages.email.duplicate[0]],
     },
     code: {
       type: 'string',

@@ -24,7 +24,7 @@ router
   .patch(userController.updateUser)
   .delete(userController.deleteUser)
 
-// Now every request needs to put his 'password' in the body
+// Now every request needs to put his 'password' into the body
 router.use(accountController.checkPassAfterSignedinMiddleWare)
 
 router.patch('/change-password', accountController.changePassword)
