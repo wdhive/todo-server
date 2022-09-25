@@ -45,9 +45,7 @@ module.exports = class TaskSocketClient {
       socketStore.remove(roomId, socket.id)
     })
 
-    console.log(
-      `---> Connected with "${user.email}" from "${socket.handshake.address}"`
-    )
+    console.log(`---> Connected with "${user.email}" in room "${user._id}"`)
 
     socketStore.add(this)
   }
