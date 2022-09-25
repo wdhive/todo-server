@@ -2,12 +2,16 @@ const mongoose = require('mongoose')
 
 const participantSchema = mongoose.Schema(
   {
-    participant: {
+    _id: false,
+    user: {
       type: mongoose.Types.ObjectId,
       required: true,
+      ref: 'user',
     },
-    permissions: {
-      type: Array,
+    role: {
+      type: String,
+      enum: ['admin', 'mod', 'assigner'],
+      default: 'assigner',
       required: true,
     },
   },
@@ -27,6 +31,7 @@ const taskSchema = mongoose.Schema(
     owner: {
       type: mongoose.Types.ObjectId,
       required: true,
+      ref: 'user',
     },
     completed: {
       type: Boolean,
@@ -35,6 +40,7 @@ const taskSchema = mongoose.Schema(
     },
     completedBy: {
       type: mongoose.Types.ObjectId,
+      ref: 'user',
     },
     startingDate: {
       type: Date,
@@ -44,8 +50,7 @@ const taskSchema = mongoose.Schema(
     endingDate: {
       type: Date,
     },
-
-    participants: [participantSchema],
+    activeParticipants: [participantSchema],
     pendingParticipants: [participantSchema],
   },
   { versionKey: false }
@@ -60,6 +65,38 @@ taskSchema.pre('save', function (next) {
   if (this.completed && this.completedBy) next()
   throw new ReqError('`completedBy` field is missing')
 })
+
+const hasPermission = roles => {
+  return function (user) {
+    const userId = user._id.toString()
+
+    if (this.owner.toString() === userId) return true
+
+    return this.activeParticipants.some(({ user, role }) => {
+      if (user.toString() === userId && roles.includes(role)) return true
+    })
+  }
+}
+
+taskSchema.methods.getAllParticipants = function () {
+  const allParticipants = this.activeParticipants.map(({ user }) =>
+    user.toString()
+  )
+  const pendingParticipants = this.pendingParticipants.map(({ user }) =>
+    user.toString()
+  )
+  const mixedArray = [
+    this.owner.toString(),
+    allParticipants,
+    pendingParticipants,
+  ].flat()
+
+  return Array.from(new Set(mixedArray))
+}
+
+taskSchema.methods.isAdmin = hasPermission(['admin'])
+taskSchema.methods.isMod = hasPermission(['admin', 'mod'])
+taskSchema.methods.isAssigner = hasPermission(['admin', 'mod', 'assigner'])
 
 const taskModel = mongoose.model('task', taskSchema)
 module.exports = taskModel

@@ -55,7 +55,7 @@ userSchema.methods.checkPassword = function (data) {
 }
 
 userSchema.methods.getSafeInfo = function () {
-  return getFeildsFromObject(this, 'name username email image')
+  return getFeildsFromObject(this, '_id username email name image')
 }
 
 userSchema.methods.passwordChangedAfter = function (queryTime) {

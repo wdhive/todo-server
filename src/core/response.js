@@ -26,5 +26,7 @@ exports.notFound = (req, res, next) => {
 }
 
 exports.success = function (data, code = 200) {
-  this.status(code).json(jSend.success(data))
+  const jSendData = jSend.success(data)
+  this.status(code).json(code === 204 ? null : jSendData)
+  return jSendData
 }

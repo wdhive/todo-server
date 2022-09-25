@@ -16,7 +16,7 @@ router.post('/password-forget', accountController.forgetPassword)
 router.post('/password-reset', accountController.resetPassword)
 
 // Now every request needs to be logged in
-router.use(accountController.checkUserMiddleware)
+router.use(accountController.checkAuthMiddleware)
 
 router
   .route('/')
