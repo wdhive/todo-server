@@ -1,6 +1,6 @@
 const { Server } = require('socket.io')
 const TaskSocketClient = require('./controller/tasks/task-socket-client')
-const socketStore = require('./core/socket-store')
+const socketStore = require('./socket/socket-store')
 
 const io = new Server({
   cors: {
@@ -21,5 +21,6 @@ chatIo.on('connection', async socket => {
   }
 })
 
+socketStore.initGlobalIo(io)
 socketStore.initChatIo(chatIo)
 module.exports = io

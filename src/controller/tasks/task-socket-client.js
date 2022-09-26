@@ -1,6 +1,4 @@
-const errorHandler = require('../../core/error-handler')
-const jSend = require('../../core/j-send')
-const socketStore = require('../../core/socket-store')
+const socketStore = require('../../socket/socket-store')
 const User = require('../../model/user-model')
 const jwtToken = require('../../utils/jwt-token')
 
@@ -39,7 +37,6 @@ module.exports = class TaskSocketClient {
       socketStore.remove(this.roomId, socket.id)
     })
 
-    // Dev: console.log(`---> Connected with "${user.email}" in room "${user._id}"`)
     socketStore.add(this)
   }
 }

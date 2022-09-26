@@ -29,14 +29,3 @@ exports.createOrUpdateCode = async (doc, model, data) => {
   }
 }
 
-exports.validateParticipants = list => {
-  const userIds = list.map(({ user }) => {
-    if (user && typeof user === 'string') return user
-    throw new ReqError('Invalid input')
-  })
-
-  const uniqueUserIds = new Set(userIds)
-  if (uniqueUserIds.size !== userIds.length) {
-    throw new ReqError('Duplicate input')
-  }
-}

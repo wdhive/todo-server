@@ -6,7 +6,7 @@ const sendMail = require('../../mail/send-mail')
 const errorMessages = require('../../utils/error-messages')
 const jwtToken = require('../../utils/jwt-token')
 const factory = require('./factory')
-const socketStore = require('../../core/socket-store')
+const socketStore = require('../../socket/socket-store')
 const {
   sendUserAndJWT,
   getFindUserQuery,
@@ -63,8 +63,8 @@ exports.requestEmailVerify = async (req, res) => {
 }
 
 exports.signup = async (req, res) => {
-  const { name, email, username, image, password } = req.body
-  const user = await User.create({ name, email, username, image, password })
+  const reqBody = req.getBody('name email username image password')
+  const user = await User.create(reqBody)
   await req.otpRequest.delete()
   sendUserAndJWT(res, user)
 }
@@ -129,8 +129,10 @@ exports.changePassword = async (req, res) => {
     req.user.password = new_password
     await req.user.save()
 
-    socketStore.disconnectExceptReq(req) // Only when req.body has `socketId` field
     sendUserAndJWT(res, req.user._id)
+    socketStore.disconnect(req, {
+      cause: 'Password change',
+    })
   } else throw new ReqError(errorMessages.extra.enteredExistingInfo('password'))
 }
 

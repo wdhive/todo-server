@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt')
 const { getFeildsFromObject } = require('../utils')
 const { runOnFieldUpdate } = require('../utils/schema')
 const errorMessages = require('../utils/error-messages')
+const { USER_SAFE_INFO } = require('../config/config')
 
 const userSchema = mongoose.Schema(
   {
@@ -55,7 +56,7 @@ userSchema.methods.checkPassword = function (data) {
 }
 
 userSchema.methods.getSafeInfo = function () {
-  return getFeildsFromObject(this, '_id username email name image')
+  return getFeildsFromObject(this, USER_SAFE_INFO)
 }
 
 userSchema.methods.passwordChangedAfter = function (queryTime) {
