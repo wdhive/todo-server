@@ -1,26 +1,23 @@
 const express = require('express')
 const router = express.Router()
-const [accountController, crudTaskController] = ReqError.catch(
+const [accountController, taskController] = ReqError.catch(
   require('../controller/account/account-controller'),
-  require('../controller/tasks/crud-task-controller')
+  require('../controller/tasks/task-controller')
 )
 
 router.use(accountController.checkAuthMiddleware)
 
-router
-  .route('/')
-  .get(crudTaskController.getAllTask)
-  .post(crudTaskController.createTask)
+router.route('/').get(taskController.getAllTask).post(taskController.createTask)
 
 router
   .route('/:taskId')
-  .patch(
-    crudTaskController.setTaskParticipantsMiddleWare,
-    crudTaskController.updateTask
-  )
-  .delete(
-    crudTaskController.setTaskParticipantsMiddleWare,
-    crudTaskController.deleteTask
-  )
+  .all(taskController.setTaskParticipantsMiddleWare)
+  .patch(taskController.updateTask)
+  .delete(taskController.deleteTask)
+
+router
+  .route('/:taskId/category')
+  .post(taskController.addCategory)
+  .delete(taskController.removeCategory)
 
 module.exports = router

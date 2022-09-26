@@ -14,20 +14,24 @@ exports.taskPopulater = [
   },
 ]
 
-exports.getAllTaskCanDeleteScript = userId => {
-  userId = userId.toString()
-  return `this.owner.toString() === ${userId} ||
-     this.activeParticipants.some(({ user, role }) =>
-     user.toString() === ${userId} && role === 'admin')`
-}
-
-exports.getAllTaskScript = userId => {
-  userId = userId.toString()
-  return `this.owner.toString() === ${userId} ||
-     this.activeParticipants.some(({ user }) => user.toString() === ${userId} )`
+exports.getAllTaskFilter = userId => {
+  return {
+    $or: [
+      { owner: userId },
+      {
+        pendingParticipants: {
+          $elemMatch: {
+            user: userId,
+          },
+        },
+      },
+    ],
+  }
 }
 
 exports.validateParticipants = list => {
+  if (!list) return
+
   const userIds = list.map(({ user }) => {
     if (user && typeof user === 'string') return user
     throw new ReqError('Invalid input')

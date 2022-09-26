@@ -1,6 +1,6 @@
 const brcypt = require('bcrypt')
-const errorMessages = require('./error-messages')
-const { runOnFieldUpdate } = require('./schema')
+const errorMessages = require('../utils/error-messages')
+const { runOnFieldUpdate } = require('./utils')
 
 module.exports = schema => {
   schema.pre(

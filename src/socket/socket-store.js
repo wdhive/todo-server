@@ -72,8 +72,8 @@ class SocketStore {
       throw new DevError('rooms inside option must be an array')
     }
 
-    if (exclude != null && typeof exclude !== 'string') {
-      throw new DevError('exclude inside option must be a string')
+    if (exclude != null && exclude !== false && typeof exclude !== 'string') {
+      throw new DevError('Exclude inside option must be a string')
     }
 
     if (rooms) {
@@ -99,16 +99,6 @@ class SocketStore {
   }
 
   #exceptSocket(rooms, excludeSocket, cb) {
-    if (
-      !(
-        Array.isArray(rooms) &&
-        (excludeSocket === false || typeof excludeSocket === 'string') &&
-        cb instanceof Function
-      )
-    ) {
-      throw new DevError('Invalid input in socket Store filter')
-    }
-
     rooms.forEach(room => {
       const roomStore = this.#store[room]
       if (!roomStore) return

@@ -30,12 +30,15 @@ exports.checkAuthMiddleware = async (req, res, next) => {
 }
 
 exports.checkPassAfterSignedinMiddleWare = async (req, res, next) => {
+  if (!req.body.password) throw new ReqError('Must provide a password')
   const ok = await req.user.checkPassword(req.body.password)
   if (!ok) throw new ReqError(errorMessages.password.wrong)
   next()
 }
 
 exports.verifyEmailCodeMiddleware = async (req, res, next) => {
+  return next() // DANGER
+
   const { email, code } = req.body
   const verifyEmailRequest = await VerifyEmail.findOne({ email })
   if (!verifyEmailRequest) {
@@ -65,7 +68,7 @@ exports.requestEmailVerify = async (req, res) => {
 exports.signup = async (req, res) => {
   const reqBody = req.getBody('name email username image password')
   const user = await User.create(reqBody)
-  await req.otpRequest.delete()
+  // await req.otpRequest.delete()
   sendUserAndJWT(res, user)
 }
 

@@ -1,22 +1,43 @@
 const Task = require('../../model/task-model')
+const TaskCategory = require('../../model/task-category-model')
+const UserSettings = require('../../model/user-settings-model')
 const TaskSocketClient = require('./task-socket-client')
 const socketStore = require('../../socket/socket-store')
 const { getFeildsFromObject } = require('../../utils')
 const {
   taskPopulater,
-  getAllTaskScript,
+  getAllTaskFilter,
   validateParticipants,
 } = require('./utils')
 
-exports.getAllTask = async (req, res) => {
-  const tasks = await getAllTaskScript(req.user._id)
-    .limit(100)
-    .lean()
-    .populate(taskPopulater)
+exports.setTaskParticipantsMiddleWare = async (req, res, next) => {
+  const task = await Task.findById(req.params.taskId).select(
+    'owner pendingParticipants activeParticipants'
+  )
+  if (!task) throw new ReqError('No task found', 404)
+  req.task = task
+  next()
+}
 
-  const tasksCount = await Task.find()
-    .where(getAllTaskScript(req.user._id))
-    .estimatedDocumentCount()
+exports.getAllTask = async (req, res) => {
+  const queryScript = getAllTaskFilter(req.user._id)
+  const tasks = await Task.find(queryScript).lean().populate(taskPopulater)
+  const tasksCount = await Task.find(queryScript).countDocuments()
+
+  const taskIds = tasks.map(task => task._id)
+  const taskCategories = await TaskCategory.find({
+    user: req.user._id,
+    task: taskIds,
+  })
+
+  tasks.forEach(task => {
+    const taskCategory = taskCategories.find(
+      taskCategory => taskCategory.task.toString() === task._id.toString()
+    )
+    if (taskCategory) {
+      task.category = taskCategory.category
+    }
+  })
 
   res.success({ tasksCount, tasks })
 }
@@ -25,6 +46,7 @@ exports.createTask = async (req, res) => {
   const taskBody = req.getBody(
     'title description startingDate endingDate pendingParticipants'
   )
+
   validateParticipants(taskBody.pendingParticipants)
 
   const task = await (
@@ -85,12 +107,38 @@ exports.deleteTask = async (req, res) => {
   )
 }
 
-exports.setTaskParticipantsMiddleWare = async (req, res, next) => {
-  const task = await Task.findById(req.params.taskId).select(
-    'owner pendingParticipants activeParticipants'
-  )
-  if (!task) throw new ReqError('No task found', 404)
+exports.addCategory = async (req, res) => {
+  const categoryIsExists = await UserSettings.find({
+    $and: [
+      {
+        _id: req.user._id,
+      },
 
-  req.task = task
-  next()
+      {
+        taskCategories: {
+          $elemMatch: {
+            _id: req.body.category,
+          },
+        },
+      },
+    ],
+  }).countDocuments()
+  if (!categoryIsExists) throw new ReqError('Category not exists!')
+
+  const category = await TaskCategory.create({
+    user: req.user._id,
+    task: req.params.taskId,
+    category: req.body.category,
+  })
+
+  res.success({ category })
+}
+
+exports.removeCategory = async (req, res) => {
+  await TaskCategory.deleteMany({
+    user: req.user._id,
+    category: req.body.category,
+  })
+
+  res.success(null, 204)
 }

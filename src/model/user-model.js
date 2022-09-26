@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 const bcrypt = require('bcrypt')
 const { getFeildsFromObject } = require('../utils')
-const { runOnFieldUpdate } = require('../utils/schema')
+const { runOnFieldUpdate } = require('./utils')
 const errorMessages = require('../utils/error-messages')
 const { USER_SAFE_INFO } = require('../config/config')
 
@@ -36,7 +36,10 @@ const userSchema = mongoose.Schema(
       default: Date.now,
     },
   },
-  { versionKey: false }
+  {
+    versionKey: false,
+    toJSON: { virtuals: true },
+  }
 )
 
 userSchema.pre(
@@ -50,6 +53,12 @@ userSchema.pre(
     next()
   })
 )
+
+userSchema.virtual('settings', {
+  ref: 'user-settings',
+  localField: '_id',
+  foreignField: '_id',
+})
 
 userSchema.methods.checkPassword = function (data) {
   return bcrypt.compare(data, this.password)

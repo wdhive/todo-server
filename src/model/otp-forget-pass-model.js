@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 const { FORGET_PASS_OTP_EXPIRE_DURATION } = require('../config/config')
-const otpSchemaHelpers = require('../utils/otp-schema-helpers')
+const otpSchemaHelpers = require('./utils-otp')
 
 const schema = mongoose.Schema(
   {
