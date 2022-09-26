@@ -1,39 +1,40 @@
-const accountUtils = require('../account/utils')
 const Task = require('../../model/task-model')
 const TaskSocketClient = require('./task-socket-client')
-const socketStore = require('../../core/socket-store')
+const socketStore = require('../../socket/socket-store')
 const { getFeildsFromObject } = require('../../utils')
-const { taskPopulater, generateGetAllTaskQuery } = require('./utils')
+const {
+  taskPopulater,
+  getAllTaskScript,
+  validateParticipants,
+} = require('./utils')
 
 exports.getAllTask = async (req, res) => {
-  const tasks = await generateGetAllTaskQuery(req.user._id)
+  const tasks = await getAllTaskScript(req.user._id)
     .limit(100)
     .lean()
     .populate(taskPopulater)
 
-  const tasksCount = await generateGetAllTaskQuery(
-    req.user._id
-  ).estimatedDocumentCount()
+  const tasksCount = await Task.find()
+    .where(getAllTaskScript(req.user._id))
+    .estimatedDocumentCount()
 
   res.success({ tasksCount, tasks })
 }
 
 exports.createTask = async (req, res) => {
-  const { title, description, startingDate, endingDate, pendingParticipants } =
-    req.body
-  accountUtils.validateParticipants(pendingParticipants)
+  const taskBody = req.getBody(
+    'title description startingDate endingDate pendingParticipants'
+  )
+  validateParticipants(taskBody.pendingParticipants)
 
   const task = await (
     await Task.create({
-      title,
-      description,
-      startingDate,
-      endingDate,
+      ...taskBody,
       owner: req.user._id,
-      pendingParticipants,
     })
   ).populate(taskPopulater)
-  socketStore.sendDataExceptReq(
+
+  socketStore.send(
     req,
     TaskSocketClient.events.task.create,
     res.success({ task }, 201)
@@ -47,8 +48,7 @@ exports.updateTask = async (req, res) => {
     } else throw new ReqError('You do not have permission to update this task')
   }
 
-  let taskBody = getFeildsFromObject(
-    req.body,
+  let taskBody = req.getBody(
     'title description startingDate endingDate completed'
   )
 
@@ -61,7 +61,7 @@ exports.updateTask = async (req, res) => {
   }
 
   const updatedTask = await (await req.task.save()).populate(taskPopulater)
-  socketStore.sendDataExceptReq(
+  socketStore.send(
     req,
     TaskSocketClient.events.task.update,
     res.success({ task: updatedTask })
@@ -75,11 +75,13 @@ exports.deleteTask = async (req, res) => {
   await req.task.delete()
   const allParticipants = req.task.getAllParticipants()
 
-  socketStore.sendDataExcept(
-    allParticipants,
-    req.body && req.body.socketId,
+  socketStore.send(
+    req,
     TaskSocketClient.events.task.delete,
-    res.success({ taskId: req.task._id }, 204)
+    res.success({ taskId: req.task._id }, 204),
+    {
+      rooms: allParticipants,
+    }
   )
 }
 

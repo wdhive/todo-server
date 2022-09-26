@@ -1,7 +1,9 @@
 const errorMessages = require('../../utils/error-messages')
 
 exports.changeEmailAndUsername = field => async (req, res) => {
-  const new_Details = req.body['new_' + field]
+  const key = 'new_' + field
+  const new_Details = req.body[key]
+
   if (req[field] !== new_Details) {
     req.user[field] = new_Details
     req.user = await req.user.save()
