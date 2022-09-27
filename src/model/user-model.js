@@ -23,7 +23,7 @@ const userSchema = mongoose.Schema(
       required: [true, errorMessages.username.fieldMissing[0]],
       unique: [true, errorMessages.username.duplicate[0]],
       lowercase: true,
-      match: [/^[a-z0-9]+$/, 'Enter a valid name.'],
+      match: [/^[a-z0-9]+$/, 'Enter a valid username.'],
     },
     email: commonSchemaField.email,
     image: {

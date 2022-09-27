@@ -21,14 +21,14 @@ exports.setTaskParticipantsMiddleWare = async (req, res, next) => {
 
 exports.getAllTask = async (req, res) => {
   const queryScript = getAllTaskFilter(req.user._id)
-  const tasks = await Task.find(queryScript).lean().populate(taskPopulater)
+  const tasks = await Task.find(queryScript).populate(taskPopulater)
   const tasksCount = await Task.find(queryScript).countDocuments()
 
   const taskIds = tasks.map(task => task._id)
   const taskCategories = await TaskCategory.find({
     user: req.user._id,
     task: taskIds,
-  }).select('task category -_id')
+  })
 
   res.success({ tasksCount, tasks, taskCategories })
 }
@@ -121,6 +121,7 @@ exports.addCategory = async (req, res) => {
       },
     ],
   }).countDocuments()
+
   if (!isTaskExists) throw new ReqError('Task not exists!')
   if (!isCategoryExists) throw new ReqError('Category not exists!')
 

@@ -21,12 +21,12 @@ router.post('/:taskId/category', taskController.addCategory)
 router.delete('/:taskId/category/:categoryId', taskController.removeCategory)
 
 router
-  .route('/:taskId/participant')
+  .route('/:taskId/participants')
   .all(taskController.setTaskParticipantsMiddleWare)
   .post(participantController.inviteUser)
 
 router
-  .route('/:taskId/participant/:userId')
+  .route('/:taskId/participants/:userId')
   .all(taskController.setTaskParticipantsMiddleWare)
   .delete(participantController.removeUser)
   .patch(participantController.changeRole)

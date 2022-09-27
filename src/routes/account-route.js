@@ -52,7 +52,7 @@ router
   )
 
 // Now every request needs to put his 'password' into the body
-router.all(accountController.checkPassAfterSignedinMiddleWare)
+router.use(accountController.checkPassAfterSignedinMiddleWare)
 
 router.patch('/change-password', accountController.changePassword)
 router.patch('/change-username', accountController.changeUsername)

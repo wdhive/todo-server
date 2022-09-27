@@ -19,7 +19,7 @@ const userSettingsSchema = mongoose.Schema(
           type: Number,
           required: true,
           min: 0,
-          max: 240,
+          max: 360,
         },
       },
     ],

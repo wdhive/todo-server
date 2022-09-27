@@ -5,8 +5,7 @@ const generateOtp = require('../../utils/generate-otp')
 const sendMail = require('../../mail/send-mail')
 const errorMessages = require('../../utils/error-messages')
 const jwtToken = require('../../utils/jwt-token')
-const factory = require('./factory')
-const socketStore = require('../../socket/socket-store')
+const accountFactory = require('./account-factory')
 const {
   sendUserAndJWT,
   getFindUserQuery,
@@ -50,13 +49,11 @@ exports.verifyEmailCodeMiddleware = async (req, res, next) => {
 
 exports.requestEmailVerify = async (req, res) => {
   const { email } = req.body
-
-  if (await User.findOne({ email })) {
+  if (await User.findOne({ email }).countDocuments()) {
     throw new ReqError(errorMessages.email.duplicate)
   }
 
   const code = generateOtp(6)
-
   await createOrUpdateCode(await VerifyEmail.findOne({ email }), VerifyEmail, {
     email,
     code,
@@ -85,7 +82,7 @@ exports.login = async (req, res) => {
 
 exports.forgetPassword = async (req, res) => {
   const { login } = req.body
-  const user = await User.findOne(getFindUserQuery(login)).lean()
+  const user = await User.findOne(getFindUserQuery(login)).select('email')
 
   res.success({
     email,
@@ -93,11 +90,11 @@ exports.forgetPassword = async (req, res) => {
   })
 
   if (!user) return
+
   const userId = user?._id
   try {
     const existingRequest = await ForgetPass.findById(userId)
     const code = generateOtp(8)
-
     await createOrUpdateCode(existingRequest, ForgetPass, { _id: userId, code })
     await sendMail.forgetPassCode(user.email, code)
   } catch {}
@@ -120,19 +117,6 @@ exports.resetPassword = async (req, res) => {
   sendUserAndJWT(res, user)
 }
 
-exports.changePassword = async (req, res) => {
-  const { password, new_password } = req.body
-
-  if (password !== new_password) {
-    req.user.password = new_password
-    await req.user.save()
-
-    sendUserAndJWT(res, req.user._id)
-    socketStore.disconnect(req, {
-      cause: 'Password change',
-    })
-  } else throw new ReqError(errorMessages.extra.enteredExistingInfo('password'))
-}
-
-exports.changeEmail = factory.changeEmailAndUsername('email')
-exports.changeUsername = factory.changeEmailAndUsername('username')
+exports.changePassword = accountFactory.changeEmailAndUsername('password')
+exports.changeEmail = accountFactory.changeEmailAndUsername('email')
+exports.changeUsername = accountFactory.changeEmailAndUsername('username')
