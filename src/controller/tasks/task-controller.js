@@ -37,16 +37,10 @@ exports.createTask = async (req, res) => {
   const taskBody = req.getBody(
     'title description startingDate endingDate pendingParticipants'
   )
-
   await validateParticipants(taskBody.pendingParticipants)
-
-  const task = await (
-    await Task.create({
-      ...taskBody,
-      owner: req.user._id,
-    })
-  ).populate(taskPopulater)
-
+  
+  taskBody.owner = req.user._id
+  const task = await (await Task.create(taskBody)).populate(taskPopulater)
   socketStore.send(
     req,
     TaskSocketClient.events.task.create,
@@ -54,6 +48,7 @@ exports.createTask = async (req, res) => {
   )
 }
 
+// (Role + Permission) kahini
 exports.updateTask = async (req, res) => {
   if (!req.task.isMod(req.user)) {
     if (req.task.isAssigner(req.user)) {
@@ -139,6 +134,5 @@ exports.removeCategory = async (req, res) => {
     user: req.user._id,
     category: req.params.categoryId,
   })
-
   res.success(null, 204)
 }

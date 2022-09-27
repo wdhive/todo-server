@@ -9,7 +9,7 @@ const [userController, accountController, settingsController] = ReqError.catch(
 router.post('/request-email-verify', accountController.requestEmailVerify)
 router.post(
   '/signup',
-  accountController.verifyEmailCodeMiddleware,
+  accountController.verifyEmailOtpMiddleware,
   accountController.signup
 )
 router.post('/login', accountController.login)
@@ -58,7 +58,7 @@ router.patch('/change-password', accountController.changePassword)
 router.patch('/change-username', accountController.changeUsername)
 router.patch(
   '/change-email',
-  accountController.verifyEmailCodeMiddleware,
+  accountController.verifyEmailOtpMiddleware,
   accountController.changeEmail
 )
 

@@ -1,11 +1,11 @@
-exports.getUser = async (req, res) => {
-  if (req.query.settings !== undefined) {
-    req.user = await req.user.populate('settings')
-  }
+const UserSettings = require('../../model/user-settings-model')
 
-  res.success({
-    user: req.user.getSafeInfo(),
-  })
+exports.getUser = async (req, res) => {
+  const data = { user: req.user.getSafeInfo() }
+  if (req.query.settings !== undefined) {
+    data.settings = await UserSettings.findById(req.user._id)
+  }
+  res.success(data)
 }
 
 exports.updateUser = async (req, res) => {

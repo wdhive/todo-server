@@ -16,7 +16,6 @@ exports.findAndSetTaskCategoryMiddleware = async (req, res, next) => {
   if (!category) {
     throw new ReqError('No category found with this id')
   }
-
   req.userSettingsCategory = category
 }
 
@@ -39,7 +38,6 @@ exports.deleteTaskCategory = async (req, res) => {
   req.userSettingsCategory.remove()
   await req.userSettings.save()
   await TaskCategory.deleteMany({ category: req.params.categoryId })
-
   res.success(null, 204)
 }
 

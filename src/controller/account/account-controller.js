@@ -35,7 +35,7 @@ exports.checkPassAfterSignedinMiddleWare = async (req, res, next) => {
   next()
 }
 
-exports.verifyEmailCodeMiddleware = async (req, res, next) => {
+exports.verifyEmailOtpMiddleware = async (req, res, next) => {
   const { email, code } = req.body
   const verifyEmailRequest = await VerifyEmail.findOne({ email })
   if (!verifyEmailRequest) {

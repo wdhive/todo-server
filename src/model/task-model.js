@@ -66,18 +66,6 @@ taskSchema.pre('save', function (next) {
   throw new ReqError('`completedBy` field is missing')
 })
 
-const hasPermission = roles => {
-  return function (user) {
-    const userId = user._id.toString()
-
-    if (this.owner.toString() === userId) return true
-
-    return this.activeParticipants.some(({ user, role }) => {
-      if (user.toString() === userId && roles.includes(role)) return true
-    })
-  }
-}
-
 taskSchema.methods.getAllParticipants = function () {
   const allParticipants = this.activeParticipants.map(({ user }) =>
     user.toString()
@@ -92,6 +80,18 @@ taskSchema.methods.getAllParticipants = function () {
   ].flat()
 
   return Array.from(new Set(mixedArray))
+}
+
+const hasPermission = roles => {
+  return function (user) {
+    const userId = user._id.toString()
+
+    if (this.owner.toString() === userId) return true
+
+    return this.activeParticipants.some(({ user, role }) => {
+      if (user.toString() === userId && roles.includes(role)) return true
+    })
+  }
 }
 
 taskSchema.methods.isAdmin = hasPermission(['admin'])

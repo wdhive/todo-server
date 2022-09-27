@@ -76,13 +76,6 @@ userSchema.post('remove', function () {
   })
 })
 
-userSchema.virtual('settings', {
-  ref: 'user-settings',
-  localField: '_id',
-  foreignField: '_id',
-  justOne: true,
-})
-
 userSchema.methods.checkPassword = function (password) {
   if (!password) {
     throw new ReqError(errorMessages.password.fieldMissing)
