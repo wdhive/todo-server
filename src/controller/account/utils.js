@@ -1,6 +1,5 @@
 const mongoose = require('mongoose')
 const jwtToken = require('../../utils/jwt-token')
-const errorMessages = require('../../utils/error-messages')
 const User = require('../../model/user-model')
 
 exports.sendUserAndJWT = (res, user) => {
@@ -13,11 +12,9 @@ exports.sendUserAndJWT = (res, user) => {
   res.success(data)
 }
 
-exports.getFindUserQuery = (email, username) => {
-  if (email && username) {
-    throw new ReqError(errorMessages.extra.findWithEmailAndPassword)
-  }
-  return email ? { email } : { username }
+exports.getFindUserQuery = login => {
+  if (typeof login !== 'string') throw new ReqError('Login field is missing')
+  return login.includes('@') ? { email: login } : { username: login }
 }
 
 exports.createOrUpdateCode = async (doc, model, data) => {
@@ -29,3 +26,8 @@ exports.createOrUpdateCode = async (doc, model, data) => {
   }
 }
 
+exports.usersExists = async userIds => {
+  const uniqueUserIds = [...new Set(userIds)]
+  const usersCount = await User.find({ _id: uniqueUserIds }).countDocuments()
+  return uniqueUserIds.length === usersCount
+}

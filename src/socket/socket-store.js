@@ -72,18 +72,18 @@ class SocketStore {
       throw new DevError('rooms inside option must be an array')
     }
 
-    if (exclude != null && typeof exclude !== 'string') {
-      throw new DevError('exclude inside option must be a string')
+    if (exclude != null && exclude !== false && typeof exclude !== 'string') {
+      throw new DevError('Exclude inside option must be a string')
     }
 
     if (rooms) {
       newObj.rooms = rooms
     } else if (Array.isArray(roomOrReq)) {
       newObj.rooms = roomOrReq
-    } else if (typeof roomOrReq === 'string') {
-      newObj.rooms = [roomOrReq]
     } else if (reqMode) {
       newObj.rooms = [roomOrReq.user._id]
+    } else {
+      newObj.rooms = [roomOrReq]
     }
 
     if (exclude != null) {
@@ -99,16 +99,6 @@ class SocketStore {
   }
 
   #exceptSocket(rooms, excludeSocket, cb) {
-    if (
-      !(
-        Array.isArray(rooms) &&
-        (excludeSocket === false || typeof excludeSocket === 'string') &&
-        cb instanceof Function
-      )
-    ) {
-      throw new DevError('Invalid input in socket Store filter')
-    }
-
     rooms.forEach(room => {
       const roomStore = this.#store[room]
       if (!roomStore) return

@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 const { VERIFY_EMAIL_EXPIRE_DURATION } = require('../config/config')
 const errorMessages = require('../utils/error-messages')
-const otpSchemaHelpers = require('../utils/otp-schema-helpers')
+const otpSchemaHelpers = require('./utils-otp')
 
 const schema = mongoose.Schema(
   {

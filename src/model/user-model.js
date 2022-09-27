@@ -1,9 +1,14 @@
 const mongoose = require('mongoose')
 const bcrypt = require('bcrypt')
 const { getFeildsFromObject } = require('../utils')
-const { runOnFieldUpdate } = require('../utils/schema')
+const { runOnFieldUpdate } = require('./utils')
 const errorMessages = require('../utils/error-messages')
 const { USER_SAFE_INFO } = require('../config/config')
+const VerifyEmail = require('./otp-verify-email-model')
+const Task = require('./task-model')
+const TaskCategory = require('./task-category-model')
+const UserSettings = require('./user-settings-model')
+const socketStore = require('../socket/socket-store')
 
 const userSchema = mongoose.Schema(
   {
@@ -36,7 +41,10 @@ const userSchema = mongoose.Schema(
       default: Date.now,
     },
   },
-  { versionKey: false }
+  {
+    versionKey: false,
+    toJSON: { virtuals: true },
+  }
 )
 
 userSchema.pre(
@@ -51,8 +59,34 @@ userSchema.pre(
   })
 )
 
-userSchema.methods.checkPassword = function (data) {
-  return bcrypt.compare(data, this.password)
+userSchema.post('save', async function () {
+  VerifyEmail.deleteOne({ email: this.email }).catch(() => {})
+})
+
+userSchema.post('remove', function () {
+  Promise.all([
+    Task.deleteMany({ owner: this._id }),
+    TaskCategory.deleteMany({ user: this._id }),
+    UserSettings.deleteOne({ _id: this._id }),
+  ]).catch(() => {})
+
+  socketStore.disconnect(this._id, {
+    cause: 'Delete Account',
+  })
+})
+
+userSchema.virtual('settings', {
+  ref: 'user-settings',
+  localField: '_id',
+  foreignField: '_id',
+  justOne: true,
+})
+
+userSchema.methods.checkPassword = function (password) {
+  if (!password) {
+    throw new ReqError(errorMessages.password.fieldMissing)
+  }
+  return bcrypt.compare(password, this.password)
 }
 
 userSchema.methods.getSafeInfo = function () {

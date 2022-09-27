@@ -30,6 +30,7 @@ exports.checkAuthMiddleware = async (req, res, next) => {
 }
 
 exports.checkPassAfterSignedinMiddleWare = async (req, res, next) => {
+  if (!req.body.password) throw new ReqError('Must provide a password')
   const ok = await req.user.checkPassword(req.body.password)
   if (!ok) throw new ReqError(errorMessages.password.wrong)
   next()
@@ -44,7 +45,6 @@ exports.verifyEmailCodeMiddleware = async (req, res, next) => {
   if (!(await verifyEmailRequest.checkCode(code))) {
     throw new ReqError(errorMessages.otp.wrong)
   }
-  req.otpRequest = verifyEmailRequest
   next()
 }
 
@@ -55,27 +55,27 @@ exports.requestEmailVerify = async (req, res) => {
     throw new ReqError(errorMessages.email.duplicate)
   }
 
-  const existingRequest = await VerifyEmail.findOne({ email })
   const code = generateOtp(6)
-  await createOrUpdateCode(existingRequest, VerifyEmail, { email, code })
+
+  await createOrUpdateCode(await VerifyEmail.findOne({ email }), VerifyEmail, {
+    email,
+    code,
+  })
   sendMail.verifyEmailCode(email, code).catch(() => {})
+
   res.success({ email }, 201)
 }
 
 exports.signup = async (req, res) => {
   const reqBody = req.getBody('name email username image password')
   const user = await User.create(reqBody)
-  await req.otpRequest.delete()
   sendUserAndJWT(res, user)
 }
 
 exports.login = async (req, res) => {
-  const { email, username, password } = req.body
-  if (!password) {
-    throw new ReqError(errorMessages.password.fieldMissing)
-  }
+  const { login, password } = req.body
+  const user = await User.findOne(getFindUserQuery(login))
 
-  const user = await User.findOne(getFindUserQuery(email, username))
   if (!user || !(await user.checkPassword(password))) {
     throw new ReqError(errorMessages.auth.failed)
   }
@@ -84,30 +84,28 @@ exports.login = async (req, res) => {
 }
 
 exports.forgetPassword = async (req, res) => {
-  const { email, username } = req.body
-  const user = await User.findOne(getFindUserQuery(email, username)).lean()
-  const userId = user?._id
+  const { login } = req.body
+  const user = await User.findOne(getFindUserQuery(login)).lean()
 
   res.success({
     email,
-    message: `Email sent to ${email}, if the any user exists with the email`,
+    message: `Email sent to your email, if the any user exists with the email`,
   })
 
-  if (!userId) return
-
+  if (!user) return
+  const userId = user?._id
   try {
     const existingRequest = await ForgetPass.findById(userId)
     const code = generateOtp(8)
+
     await createOrUpdateCode(existingRequest, ForgetPass, { _id: userId, code })
-    await sendMail.forgetPassCode(email, code)
-  } catch (err) {
-    console.warn(err)
-  }
+    await sendMail.forgetPassCode(user.email, code)
+  } catch {}
 }
 
 exports.resetPassword = async (req, res) => {
-  const { email, username, code, new_password } = req.body
-  const user = await User.findOne(getFindUserQuery(email, username))
+  const { login, code, new_password } = req.body
+  const user = await User.findOne(getFindUserQuery(login))
   if (!user) throw new ReqError(errorMessages.user.notFound)
 
   const forgetPassRequest = await ForgetPass.findById(user._id)

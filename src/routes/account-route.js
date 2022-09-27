@@ -1,8 +1,9 @@
 const express = require('express')
 const router = express.Router()
-const [userController, accountController] = ReqError.catch(
+const [userController, accountController, settingsController] = ReqError.catch(
   require('../controller/account/user-controller'),
-  require('../controller/account/account-controller')
+  require('../controller/account/account-controller'),
+  require('../controller/account/settings-controller')
 )
 
 router.post('/request-email-verify', accountController.requestEmailVerify)
@@ -22,10 +23,36 @@ router
   .route('/')
   .get(userController.getUser)
   .patch(userController.updateUser)
-  .delete(userController.deleteUser)
+  .delete(
+    accountController.checkPassAfterSignedinMiddleWare,
+    userController.deleteUser
+  )
+
+router
+  .route('/task-category')
+  .post(
+    settingsController.getSettingsMiddleware,
+    settingsController.addTaskCategory
+  )
+
+router
+  .route('/task-category/:categoryId')
+  .all(
+    settingsController.getSettingsMiddleware,
+    settingsController.findAndSetTaskCategoryMiddleware
+  )
+  .patch(settingsController.updateTaskCategory)
+  .delete(settingsController.deleteTaskCategory)
+
+router
+  .route('/change-theme')
+  .patch(
+    settingsController.getSettingsMiddleware,
+    settingsController.changeTheme
+  )
 
 // Now every request needs to put his 'password' into the body
-router.use(accountController.checkPassAfterSignedinMiddleWare)
+router.all(accountController.checkPassAfterSignedinMiddleWare)
 
 router.patch('/change-password', accountController.changePassword)
 router.patch('/change-username', accountController.changeUsername)
