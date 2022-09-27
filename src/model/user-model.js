@@ -82,8 +82,11 @@ userSchema.virtual('settings', {
   justOne: true,
 })
 
-userSchema.methods.checkPassword = function (data) {
-  return bcrypt.compare(data, this.password)
+userSchema.methods.checkPassword = function (password) {
+  if (!password) {
+    throw new ReqError(errorMessages.password.fieldMissing)
+  }
+  return bcrypt.compare(password, this.password)
 }
 
 userSchema.methods.getSafeInfo = function () {
