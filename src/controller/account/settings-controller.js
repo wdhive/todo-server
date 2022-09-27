@@ -1,5 +1,5 @@
+const TaskCategory = require('../../model/task-category-model')
 const UserSettings = require('../../model/user-settings-model')
-// Must need refactor [DRY]
 
 exports.getSettingsMiddleware = async (req, res, next) => {
   let settings = await UserSettings.findById(req.user._id)
@@ -11,6 +11,15 @@ exports.getSettingsMiddleware = async (req, res, next) => {
   next()
 }
 
+exports.findAndSetTaskCategoryMiddleware = async (req, res, next) => {
+  const category = req.userSettings.taskCategories.id(req.params.categoryId)
+  if (!category) {
+    throw new ReqError('No category found with this id')
+  }
+
+  req.userSettingsCategory = category
+}
+
 exports.addTaskCategory = async (req, res) => {
   const category = req.userSettings.taskCategories.create(req.body)
   req.userSettings.taskCategories.push(category)
@@ -19,20 +28,18 @@ exports.addTaskCategory = async (req, res) => {
 }
 
 exports.updateTaskCategory = async (req, res) => {
-  const category = req.userSettings.taskCategories.id(req.params.categoryId)
+  const category = req.userSettingsCategory
   delete req.body._id
   category.set(req.body)
   await req.userSettings.save()
   res.success({ category })
 }
 
-exports.removeTaskCategory = async (req, res) => {
-  const category = req.userSettings.taskCategories.id(req.params.categoryId)
-  if (!category) {
-    throw new ReqError('No category found with this id')
-  }
-  category.remove()
+exports.deleteTaskCategory = async (req, res) => {
+  req.userSettingsCategory.remove()
   await req.userSettings.save()
+  await TaskCategory.deleteMany({ category: req.params.categoryId })
+
   res.success(null, 204)
 }
 

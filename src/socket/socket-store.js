@@ -80,10 +80,10 @@ class SocketStore {
       newObj.rooms = rooms
     } else if (Array.isArray(roomOrReq)) {
       newObj.rooms = roomOrReq
-    } else if (typeof roomOrReq === 'string') {
-      newObj.rooms = [roomOrReq]
     } else if (reqMode) {
       newObj.rooms = [roomOrReq.user._id]
+    } else {
+      newObj.rooms = [roomOrReq]
     }
 
     if (exclude != null) {

@@ -1,4 +1,5 @@
 const { USER_PUBLIC_INFO } = require('../../config/config')
+const { usersExists } = require('../account/utils')
 
 exports.taskPopulater = [
   {
@@ -29,7 +30,7 @@ exports.getAllTaskFilter = userId => {
   }
 }
 
-exports.validateParticipants = list => {
+exports.validateParticipants = async list => {
   if (!list) return
 
   const userIds = list.map(({ user }) => {
@@ -40,5 +41,9 @@ exports.validateParticipants = list => {
   const uniqueUserIds = new Set(userIds)
   if (uniqueUserIds.size !== userIds.length) {
     throw new ReqError('Duplicate input')
+  }
+
+  if (!(await usersExists(userIds))) {
+    throw new ReqError('All the users does not exists')
   }
 }

@@ -28,18 +28,9 @@ exports.getAllTask = async (req, res) => {
   const taskCategories = await TaskCategory.find({
     user: req.user._id,
     task: taskIds,
-  })
+  }).select('task category -_id')
 
-  tasks.forEach(task => {
-    const taskCategory = taskCategories.find(
-      taskCategory => taskCategory.task.toString() === task._id.toString()
-    )
-    if (taskCategory) {
-      task.category = taskCategory.category
-    }
-  })
-
-  res.success({ tasksCount, tasks })
+  res.success({ tasksCount, tasks, taskCategories })
 }
 
 exports.createTask = async (req, res) => {
@@ -47,7 +38,7 @@ exports.createTask = async (req, res) => {
     'title description startingDate endingDate pendingParticipants'
   )
 
-  validateParticipants(taskBody.pendingParticipants)
+  await validateParticipants(taskBody.pendingParticipants)
 
   const task = await (
     await Task.create({
@@ -83,10 +74,15 @@ exports.updateTask = async (req, res) => {
   }
 
   const updatedTask = await (await req.task.save()).populate(taskPopulater)
+  const taskCategories = await TaskCategory.find({
+    user: req.user._id,
+    task: [updatedTask._id],
+  })
+
   socketStore.send(
     req,
     TaskSocketClient.events.task.update,
-    res.success({ task: updatedTask })
+    res.success({ task: updatedTask, taskCategories })
   )
 }
 
@@ -95,6 +91,7 @@ exports.deleteTask = async (req, res) => {
     throw new ReqError('You do not have permission to delete this task')
   }
   await req.task.delete()
+  await TaskCategory.deleteMany({ task: req.task._id })
   const allParticipants = req.task.getAllParticipants()
 
   socketStore.send(
@@ -108,7 +105,8 @@ exports.deleteTask = async (req, res) => {
 }
 
 exports.addCategory = async (req, res) => {
-  const categoryIsExists = await UserSettings.find({
+  const isTaskExists = await Task.findById(req.params.taskId).countDocuments()
+  const isCategoryExists = await UserSettings.find({
     $and: [
       {
         _id: req.user._id,
@@ -123,7 +121,8 @@ exports.addCategory = async (req, res) => {
       },
     ],
   }).countDocuments()
-  if (!categoryIsExists) throw new ReqError('Category not exists!')
+  if (!isTaskExists) throw new ReqError('Task not exists!')
+  if (!isCategoryExists) throw new ReqError('Category not exists!')
 
   const category = await TaskCategory.create({
     user: req.user._id,
@@ -137,7 +136,7 @@ exports.addCategory = async (req, res) => {
 exports.removeCategory = async (req, res) => {
   await TaskCategory.deleteMany({
     user: req.user._id,
-    category: req.body.category,
+    category: req.params.categoryId,
   })
 
   res.success(null, 204)

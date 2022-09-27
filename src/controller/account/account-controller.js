@@ -37,8 +37,6 @@ exports.checkPassAfterSignedinMiddleWare = async (req, res, next) => {
 }
 
 exports.verifyEmailCodeMiddleware = async (req, res, next) => {
-  return next() // DANGER
-
   const { email, code } = req.body
   const verifyEmailRequest = await VerifyEmail.findOne({ email })
   if (!verifyEmailRequest) {
@@ -47,7 +45,6 @@ exports.verifyEmailCodeMiddleware = async (req, res, next) => {
   if (!(await verifyEmailRequest.checkCode(code))) {
     throw new ReqError(errorMessages.otp.wrong)
   }
-  req.otpRequest = verifyEmailRequest
   next()
 }
 
@@ -58,17 +55,20 @@ exports.requestEmailVerify = async (req, res) => {
     throw new ReqError(errorMessages.email.duplicate)
   }
 
-  const existingRequest = await VerifyEmail.findOne({ email })
   const code = generateOtp(6)
-  await createOrUpdateCode(existingRequest, VerifyEmail, { email, code })
+
+  await createOrUpdateCode(await VerifyEmail.findOne({ email }), VerifyEmail, {
+    email,
+    code,
+  })
   sendMail.verifyEmailCode(email, code).catch(() => {})
+
   res.success({ email }, 201)
 }
 
 exports.signup = async (req, res) => {
   const reqBody = req.getBody('name email username image password')
   const user = await User.create(reqBody)
-  // await req.otpRequest.delete()
   sendUserAndJWT(res, user)
 }
 
@@ -101,11 +101,10 @@ exports.forgetPassword = async (req, res) => {
   try {
     const existingRequest = await ForgetPass.findById(userId)
     const code = generateOtp(8)
+
     await createOrUpdateCode(existingRequest, ForgetPass, { _id: userId, code })
     await sendMail.forgetPassCode(email, code)
-  } catch (err) {
-    console.warn(err)
-  }
+  } catch {}
 }
 
 exports.resetPassword = async (req, res) => {

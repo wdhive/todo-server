@@ -1,6 +1,3 @@
-const Task = require('../../model/task-model')
-const socketStore = require('../../socket/socket-store')
-
 exports.getUser = async (req, res) => {
   if (req.query.settings !== undefined) {
     req.user = await req.user.populate('settings')
@@ -27,11 +24,5 @@ exports.updateUser = async (req, res) => {
 
 exports.deleteUser = async (req, res) => {
   await req.user.delete()
-  socketStore.disconnect(req, {
-    exclude: false,
-    cause: 'Delete Account',
-  })
-
-  await Task.deleteMany({ owner: req.user._id })
   res.success(null, 204)
 }

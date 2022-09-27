@@ -23,7 +23,10 @@ router
   .route('/')
   .get(userController.getUser)
   .patch(userController.updateUser)
-  .delete(userController.deleteUser)
+  .delete(
+    accountController.checkPassAfterSignedinMiddleWare,
+    userController.deleteUser
+  )
 
 router
   .route('/task-category')
@@ -34,9 +37,12 @@ router
 
 router
   .route('/task-category/:categoryId')
-  .all(settingsController.getSettingsMiddleware)
+  .all(
+    settingsController.getSettingsMiddleware,
+    settingsController.findAndSetTaskCategoryMiddleware
+  )
   .patch(settingsController.updateTaskCategory)
-  .delete(settingsController.removeTaskCategory)
+  .delete(settingsController.deleteTaskCategory)
 
 router
   .route('/change-theme')
