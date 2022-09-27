@@ -9,31 +9,32 @@ const Task = require('./task-model')
 const TaskCategory = require('./task-category-model')
 const UserSettings = require('./user-settings-model')
 const socketStore = require('../socket/socket-store')
+const commonSchemaField = require('./common-schema-field')
 
 const userSchema = mongoose.Schema(
   {
     name: {
       type: String,
       required: [true, errorMessages.name.fieldMissing[0]],
+      match: [/^[a-zA-Z]{1,}(?: [a-zA-Z]+){0,2}$/, 'Enter a valid name.'],
     },
     username: {
       type: String,
       required: [true, errorMessages.username.fieldMissing[0]],
       unique: [true, errorMessages.username.duplicate[0]],
       lowercase: true,
+      match: [/^[a-z0-9]+$/, 'Enter a valid name.'],
     },
-    email: {
-      type: String,
-      required: [true, errorMessages.email.fieldMissing[0]],
-      unique: [true, errorMessages.email.duplicate[0]],
-      lowercase: true,
-    },
+    email: commonSchemaField.email,
     image: {
       type: String,
+      match: [/^https:\/\//, 'Please enter a valid image url'],
     },
     password: {
       type: String,
       required: [true, errorMessages.password.fieldMissing[0]],
+      minLength: 6,
+      maxLength: 24,
     },
     passwordModifiedAt: {
       type: Date,

@@ -13,10 +13,13 @@ const userSettingsSchema = mongoose.Schema(
         name: {
           type: String,
           required: true,
+          match: [/^[a-zA-Z 0-9]+$/, 'Please insert a valid name'],
         },
         hue: {
           type: Number,
           required: true,
+          min: 0,
+          max: 240,
         },
       },
     ],
