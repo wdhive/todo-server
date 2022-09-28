@@ -1,13 +1,13 @@
 const TaskCategory = require('../../model/task-category-model')
 const UserSettings = require('../../model/user-settings-model')
 
-exports.getSettingsMiddleware = async (req, res, next) => {
+exports.setSettings = async (req, res, next) => {
   let settings = await UserSettings.findById(req.user._id)
   req.userSettings = settings
   next()
 }
 
-exports.findAndSetTaskCategoryMiddleware = async (req, res, next) => {
+exports.setTaskCategory = async (req, res, next) => {
   const category = req.userSettings.taskCategories.id(req.params.categoryId)
   if (!category) {
     throw new ReqError('No category found with this id')
@@ -39,9 +39,8 @@ exports.deleteTaskCategory = async (req, res) => {
 }
 
 exports.changeTheme = async (req, res) => {
-  const themeBody = req.getFields('theme hue')
-  req.userSettings.set(themeBody)
-  const newSettings = await req.userSettings.save()
+  const themeBody = req.getBody('theme hue')
+  const newSettings = await req.userSettings.set(themeBody).save()
   res.success({
     theme: newSettings.theme,
     hue: newSettings.hue,

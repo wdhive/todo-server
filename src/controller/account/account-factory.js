@@ -2,7 +2,7 @@ const socketStore = require('../../socket/socket-store')
 const errorMessages = require('../../utils/error-messages')
 const { sendJWT } = require('../account/utils')
 
-exports.changeEmailAndUsername = field => async (req, res) => {
+exports.changeUserInfo = field => async (req, res) => {
   const newDetails = req.body['new_' + field]
   if (req.user[field] === newDetails) {
     throw new ReqError(errorMessages.extra.enteredExistingInfo(field))

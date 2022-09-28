@@ -9,7 +9,7 @@ const {
   sanitizeParticipant,
 } = require('./utils')
 
-exports.setTaskParticipantsMiddleWare = async (req, res, next) => {
+exports.setTaskParticipants = async (req, res, next) => {
   const task = await Task.findById(req.params.taskId).select(
     'owner participants'
   )
@@ -62,9 +62,8 @@ exports.updateTask = async (req, res) => {
     }
   }
 
-  req.task.set(taskBody)
   const updatedTask = await (
-    await req.task.save()
+    await req.task.set(taskBody).save()
   ).populate(populateParticipants)
 
   socketStore.send(
@@ -110,18 +109,31 @@ exports.addCategory = async (req, res) => {
   }).countDocuments()
   if (!isCategoryExists) throw new ReqError('Category not exists!')
 
-  const category = await TaskCategory.create({
+  const taskCategoryData = {
     user: req.user._id,
     task: req.params.taskId,
     category: req.body.category,
-  })
+  }
 
+  const isTaskCategoryAlreadyAdded = await TaskCategory.find(
+    taskCategoryData
+  ).countDocuments()
+  if (isTaskCategoryAlreadyAdded) {
+    throw new ReqError('Category already added')
+  }
+
+  const category = await TaskCategory.create(taskCategoryData)
   res.success({ category })
 }
 
 exports.removeCategory = async (req, res) => {
+  if (!(req.user._id && req.params.taskId && req.params.categoryId)) {
+    throw new ReqError('Invalid input')
+  }
+
   await TaskCategory.deleteMany({
     user: req.user._id,
+    task: req.params.taskId,
     category: req.params.categoryId,
   })
   res.success(null, 204)

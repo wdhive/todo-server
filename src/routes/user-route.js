@@ -12,14 +12,14 @@ const [
   require('../controller/user/users-search-handler')
 )
 
-router.use(accountController.checkAuthMiddleware)
+router.use(accountController.checkAuth)
 
 router
   .route('/')
   .get(userController.getUser)
   .patch(userController.updateUser)
   .delete(
-    accountController.checkPassAfterSignedinMiddleWare,
+    accountController.checkPassAfterLoggedIn,
     userController.deleteUser
   )
 
@@ -28,15 +28,15 @@ router.get('/search', usersSearchHandler)
 router
   .route('/task-category')
   .post(
-    settingsController.getSettingsMiddleware,
+    settingsController.setSettings,
     settingsController.addTaskCategory
   )
 
 router
   .route('/task-category/:categoryId')
   .all(
-    settingsController.getSettingsMiddleware,
-    settingsController.findAndSetTaskCategoryMiddleware
+    settingsController.setSettings,
+    settingsController.setTaskCategory
   )
   .patch(settingsController.updateTaskCategory)
   .delete(settingsController.deleteTaskCategory)
@@ -44,7 +44,7 @@ router
 router
   .route('/change-theme')
   .patch(
-    settingsController.getSettingsMiddleware,
+    settingsController.setSettings,
     settingsController.changeTheme
   )
 

@@ -12,7 +12,7 @@ const [
   require('../controller/tasks/tasks-search-handler')
 )
 
-router.use(accountController.checkAuthMiddleware)
+router.use(accountController.checkAuth)
 
 router.route('/').get(taskController.getAllTask).post(taskController.createTask)
 
@@ -20,7 +20,7 @@ router.get('/search', taskSearchHandler)
 
 router
   .route('/:taskId')
-  .all(taskController.setTaskParticipantsMiddleWare)
+  .all(taskController.setTaskParticipants)
   .patch(taskController.updateTask)
   .delete(taskController.deleteTask)
 
@@ -29,12 +29,12 @@ router.delete('/:taskId/category/:categoryId', taskController.removeCategory)
 
 router
   .route('/:taskId/participants')
-  .all(taskController.setTaskParticipantsMiddleWare)
+  .all(taskController.setTaskParticipants)
   .post(participantController.inviteUser)
 
 router
   .route('/:taskId/participants/:userId')
-  .all(taskController.setTaskParticipantsMiddleWare)
+  .all(taskController.setTaskParticipants)
   .delete(participantController.removeUser)
   .patch(participantController.changeRole)
 

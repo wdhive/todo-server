@@ -9,7 +9,7 @@ const accountFactory = require('./account-factory')
 const jwtToken = require('../../utils/jwt-token')
 const { sendJWT, getFindUserQuery, checkOtpRequest } = require('./utils')
 
-exports.checkAuthMiddleware = async (req, res, next) => {
+exports.checkAuth = async (req, res, next) => {
   const [token] = req.headers.authorization?.match(/\S*$/) || []
   const tokenInfo = jwtToken.verify(token)
   const user = await User.findById(tokenInfo.id)
@@ -25,14 +25,14 @@ exports.checkAuthMiddleware = async (req, res, next) => {
   next()
 }
 
-exports.checkPassAfterSignedinMiddleWare = async (req, res, next) => {
+exports.checkPassAfterLoggedIn = async (req, res, next) => {
   if (!req.body.password) throw new ReqError('Must provide a password')
   const ok = await req.user.checkPassword(req.body.password)
   if (!ok) throw new ReqError(errorMessages.password.wrong)
   next()
 }
 
-exports.emailVerifyMiddleWare = async (req, res, next) => {
+exports.verifyEmailMail = async (req, res, next) => {
   const { email } = req.body
   if (await User.findOne({ email }).countDocuments()) {
     throw new ReqError(errorMessages.email.duplicate)
@@ -42,7 +42,7 @@ exports.emailVerifyMiddleWare = async (req, res, next) => {
   next()
 }
 
-exports.forgetPasswordMiddleWare = async (req, res, next) => {
+exports.forgetPasswordMail = async (req, res, next) => {
   const { login } = req.body
   const user = await User.findOne(getFindUserQuery(login)).select('email')
   res.success({
@@ -56,7 +56,7 @@ exports.forgetPasswordMiddleWare = async (req, res, next) => {
   next()
 }
 
-exports.verifyEmailOtpMiddleware = async (req, res, next) => {
+exports.verifyEmailOtp = async (req, res, next) => {
   const { email, new_email, code } = req.body
   await checkOtpRequest(
     VerifyEmail,
@@ -128,6 +128,6 @@ exports.resetPassword = async (req, res) => {
   sendJWT(res, user._id)
 }
 
-exports.changeEmail = accountFactory.changeEmailAndUsername('email')
-exports.changeUsername = accountFactory.changeEmailAndUsername('username')
-exports.changePassword = accountFactory.changeEmailAndUsername('password')
+exports.changeEmail = accountFactory.changeUserInfo('email')
+exports.changeUsername = accountFactory.changeUserInfo('username')
+exports.changePassword = accountFactory.changeUserInfo('password')
