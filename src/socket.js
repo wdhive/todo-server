@@ -1,5 +1,5 @@
 const { Server } = require('socket.io')
-const TaskSocketClient = require('./controller/tasks/task-socket-client')
+const TaskSocketClient = require('./controller/socket-client')
 const socketStore = require('./socket/socket-store')
 
 const io = new Server({
@@ -10,11 +10,11 @@ const io = new Server({
 
 io.on('connection', socket => socket.disconnect())
 
-const chatIo = io.of('/v1/tasks-socket')
-chatIo.on('connection', async socket => {
+const taskIo = io.of('/v1/tasks-socket')
+taskIo.on('connection', async socket => {
   try {
     const user = await TaskSocketClient.checkAuth(socket)
-    new TaskSocketClient(chatIo, socket, user)
+    new TaskSocketClient(taskIo, socket, user)
   } catch (err) {
     console.log(err)
     socket.disconnect(err)
@@ -22,5 +22,5 @@ chatIo.on('connection', async socket => {
 })
 
 socketStore.initGlobalIo(io)
-socketStore.initChatIo(chatIo)
+socketStore.initChatIo(taskIo)
 module.exports = io

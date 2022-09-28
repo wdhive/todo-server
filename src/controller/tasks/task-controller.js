@@ -1,13 +1,12 @@
 const Task = require('../../model/task-model')
 const TaskCategory = require('../../model/task-category-model')
 const UserSettings = require('../../model/user-settings-model')
-const TaskSocketClient = require('./task-socket-client')
+const TaskSocketClient = require('../socket-client')
 const socketStore = require('../../socket/socket-store')
-const { getFeildsFromObject } = require('../../utils')
 const {
-  taskPopulater,
-  getAllTaskFilter,
-  checkParticipants,
+  populateParticipants,
+  getUsersAllTaskFilter,
+  sanitizeParticipant,
 } = require('./utils')
 
 exports.setTaskParticipantsMiddleWare = async (req, res, next) => {
@@ -20,9 +19,9 @@ exports.setTaskParticipantsMiddleWare = async (req, res, next) => {
 }
 
 exports.getAllTask = async (req, res) => {
-  const queryScript = getAllTaskFilter(req.user._id)
-  const tasks = await Task.find(queryScript).populate(taskPopulater)
-  const tasksCount = await Task.find(queryScript).countDocuments()
+  const queryScript = getUsersAllTaskFilter(req.user._id)
+  const tasks = await Task.find(queryScript).populate(populateParticipants)
+  const totalTasks = await Task.find(queryScript).countDocuments()
 
   const taskIds = tasks.map(task => task._id)
   const taskCategories = await TaskCategory.find({
@@ -30,7 +29,7 @@ exports.getAllTask = async (req, res) => {
     task: taskIds,
   })
 
-  res.success({ tasksCount, tasks, taskCategories })
+  res.success({ totalTasks, tasks, taskCategories })
 }
 
 exports.createTask = async (req, res) => {
@@ -38,9 +37,11 @@ exports.createTask = async (req, res) => {
     'title description startingDate endingDate participants'
   )
   taskBody.owner = req.user._id
-  taskBody.participants = await checkParticipants(taskBody)
+  taskBody.participants = await sanitizeParticipant(taskBody)
 
-  const task = await (await Task.create(taskBody)).populate(taskPopulater)
+  const task = await (
+    await Task.create(taskBody)
+  ).populate(populateParticipants)
   socketStore.send(
     req,
     TaskSocketClient.events.task.create,
@@ -49,25 +50,22 @@ exports.createTask = async (req, res) => {
 }
 
 exports.updateTask = async (req, res) => {
-  if (!req.task.moderator(req.user)) {
-    if (req.task.isAssigner(req.user)) {
-      taskBody = getFeildsFromObject(taskBody, 'completed')
-    } else throw new ReqError('You do not have permission to update this task')
-  }
-
   let taskBody = req.getBody(
     'title description startingDate endingDate completed'
   )
 
-  for (let key in taskBody) {
-    const value = taskBody[key]
-
-    if (value != null) {
-      req.task[key] = value
+  if (!req.task.isModerator(req.user)) {
+    if (req.task.isAssigner(req.user)) {
+      taskBody = req.getBody('completed')
+    } else {
+      throw new ReqError('You do not have permission to update this task')
     }
   }
 
-  const updatedTask = await (await req.task.save()).populate(taskPopulater)
+  req.task.set(taskBody)
+  const updatedTask = await (
+    await req.task.save()
+  ).populate(populateParticipants)
 
   socketStore.send(
     req,
@@ -81,27 +79,26 @@ exports.deleteTask = async (req, res) => {
     throw new ReqError('You do not have permission to delete this task')
   }
   await req.task.delete()
-  await TaskCategory.deleteMany({ task: req.task._id })
-  const participants = req.task.getAllParticipants()
 
   socketStore.send(
     req,
     TaskSocketClient.events.task.delete,
     res.success({ taskId: req.task._id }, 204),
     {
-      rooms: participants,
+      rooms: req.task.getAllParticipants(),
     }
   )
 }
 
 exports.addCategory = async (req, res) => {
   const isTaskExists = await Task.findById(req.params.taskId).countDocuments()
+  if (!isTaskExists) throw new ReqError('Task not exists!')
+
   const isCategoryExists = await UserSettings.find({
     $and: [
       {
         _id: req.user._id,
       },
-
       {
         taskCategories: {
           $elemMatch: {
@@ -111,8 +108,6 @@ exports.addCategory = async (req, res) => {
       },
     ],
   }).countDocuments()
-
-  if (!isTaskExists) throw new ReqError('Task not exists!')
   if (!isCategoryExists) throw new ReqError('Category not exists!')
 
   const category = await TaskCategory.create({

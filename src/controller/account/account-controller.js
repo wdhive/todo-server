@@ -5,13 +5,9 @@ const ForgetPass = require('../../model/otp-forget-pass-model')
 const generateOtp = require('../../utils/generate-otp')
 const sendMail = require('../../mail/send-mail')
 const errorMessages = require('../../utils/error-messages')
-const jwtToken = require('../../utils/jwt-token')
 const accountFactory = require('./account-factory')
-const {
-  sendUserAndJWT,
-  getFindUserQuery,
-  validateOtpRequest,
-} = require('./utils')
+const jwtToken = require('../../utils/jwt-token')
+const { sendJWT, getFindUserQuery, checkOtpRequest } = require('./utils')
 
 exports.checkAuthMiddleware = async (req, res, next) => {
   const [token] = req.headers.authorization?.match(/\S*$/) || []
@@ -41,6 +37,7 @@ exports.emailVerifyMiddleWare = async (req, res, next) => {
   if (await User.findOne({ email }).countDocuments()) {
     throw new ReqError(errorMessages.email.duplicate)
   }
+  req.user = { email }
   req.otpType = 'verify-email'
   next()
 }
@@ -60,21 +57,25 @@ exports.forgetPasswordMiddleWare = async (req, res, next) => {
 }
 
 exports.verifyEmailOtpMiddleware = async (req, res, next) => {
-  const { email, code } = req.body
-  await validateOtpRequest(VerifyEmail, { email }, code)
+  const { email, new_email, code } = req.body
+  await checkOtpRequest(
+    VerifyEmail,
+    {
+      email: email || new_email,
+    },
+    code
+  )
   next()
 }
 
 exports.sendOtpMail = async (req, res) => {
   const emailMode = req.otpType === 'verify-email'
+  const { email } = req.user
 
   const Model = emailMode ? VerifyEmail : ForgetPass
-  const findQuery = emailMode
-    ? { email: req.body.email }
-    : { _id: req.user._id }
+  const findQuery = emailMode ? { email } : { _id: req.user._id }
 
   const request = await Model.findOne(findQuery)
-  const email = emailMode ? req.body.email : req.user.email
   const code = generateOtp(emailMode ? 6 : 8)
 
   if (request) {
@@ -100,7 +101,7 @@ exports.signup = async (req, res) => {
     _id: user._id,
   })
 
-  sendUserAndJWT(res, user)
+  sendJWT(res, user._id)
 }
 
 exports.login = async (req, res) => {
@@ -111,7 +112,7 @@ exports.login = async (req, res) => {
     throw new ReqError(errorMessages.auth.failed)
   }
 
-  sendUserAndJWT(res, user)
+  sendJWT(res, user._id)
 }
 
 exports.resetPassword = async (req, res) => {
@@ -119,14 +120,14 @@ exports.resetPassword = async (req, res) => {
   const user = await User.findOne(getFindUserQuery(login))
 
   if (!user) throw new ReqError(errorMessages.user.notFound)
-  await validateOtpRequest(ForgetPass, { _id: user._id }, code)
+  const otpRequest = await checkOtpRequest(ForgetPass, { _id: user._id }, code)
 
   user.password = new_password
   await user.save()
   await otpRequest.delete()
-  sendUserAndJWT(res, user)
+  sendJWT(res, user._id)
 }
 
-exports.changePassword = accountFactory.changeEmailAndUsername('password')
 exports.changeEmail = accountFactory.changeEmailAndUsername('email')
 exports.changeUsername = accountFactory.changeEmailAndUsername('username')
+exports.changePassword = accountFactory.changeEmailAndUsername('password')

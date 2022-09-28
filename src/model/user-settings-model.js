@@ -15,7 +15,10 @@ const userSettingsSchema = mongoose.Schema(
       enum: ['dark', 'light'],
     },
 
-    hue: hueSchema,
+    hue: {
+      ...hueSchema,
+      required: false,
+    },
 
     taskCategories: [
       {

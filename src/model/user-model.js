@@ -34,7 +34,6 @@ const userSchema = mongoose.Schema(
       type: String,
       required: [true, errorMessages.password.fieldMissing[0]],
       minLength: 6,
-      maxLength: 24,
     },
     passwordModifiedAt: {
       type: Date,

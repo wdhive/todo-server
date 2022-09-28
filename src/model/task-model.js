@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const TaskCategory = require('./task-category-model')
 
 const participantSchema = mongoose.Schema(
   {
@@ -68,6 +69,10 @@ taskSchema.pre('save', function (next) {
 
   if (this.completed && this.completedBy) next()
   throw new ReqError('`completedBy` field is missing')
+})
+
+taskSchema.post('remove', function () {
+  Promise.all([TaskCategory.deleteMany({ user: this._id })]).catch(() => {})
 })
 
 taskSchema.methods.getAllParticipants = function () {

@@ -1,11 +1,8 @@
-const generator = require('../generator')
-
 exports.title = 'Account'
-exports.description =
-  'This page covers everything related to authentication'
+exports.description = 'This page covers everything related to authentication'
 
 exports.content = [
-  generator(
+  div(
     'Get an OTP to verify your email',
     'post',
     '/account/request-email-verify',
@@ -20,7 +17,7 @@ exports.content = [
     }
   ),
 
-  generator('Signup', 'post', '/account/signup', {
+  div('Signup', 'post', '/account/signup', {
     body: [
       {
         key: 'email',
@@ -54,7 +51,7 @@ exports.content = [
     ],
   }),
 
-  generator('Login', 'post', '/account/login', {
+  div('Login', 'post', '/account/login', {
     body: [
       {
         key: 'login',
@@ -70,7 +67,7 @@ exports.content = [
     ],
   }),
 
-  generator('Forget Password', 'post', '/account/password-forget', {
+  div('Forget Password', 'post', '/account/password-forget', {
     body: [
       {
         key: 'login',
@@ -81,7 +78,7 @@ exports.content = [
     ],
   }),
 
-  generator('Reset Password', 'post', '/account/password-reset', {
+  div('Reset Password', 'post', '/account/password-reset', {
     body: [
       {
         key: 'login',
@@ -103,7 +100,7 @@ exports.content = [
     ],
   }),
 
-  generator('Update Email', 'patch', '/account/change-email', {
+  div('Update Email', 'patch', '/account/change-email', {
     body: [
       {
         key: 'password',
@@ -125,7 +122,7 @@ exports.content = [
     ],
   }),
 
-  generator('Update Username', 'patch', '/account/change-username', {
+  div('Update Username', 'patch', '/account/change-username', {
     body: [
       {
         key: 'password',
@@ -142,7 +139,7 @@ exports.content = [
     ],
   }),
 
-  generator('Update Password', 'patch', '/account/change-password', {
+  div('Update Password', 'patch', '/account/change-password', {
     body: [
       {
         key: 'password',

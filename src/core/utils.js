@@ -71,7 +71,8 @@ exports.getBody = function (fields) {
 
   const newObj = {}
   fields.forEach(feild => {
-    newObj[feild] = this.body[feild]
+    const value = this.body[feild]
+    if (value !== undefined) newObj[feild] = value
   })
   return newObj
 }

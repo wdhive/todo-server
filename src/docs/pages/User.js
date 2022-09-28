@@ -1,11 +1,8 @@
-const generator = require('../generator')
-
 exports.title = 'User'
-exports.description =
-  'This page covers everything related to user'
+exports.description = 'This page covers everything related to user'
 
 exports.content = [
-  generator('Get User', 'get', '/account', {
+  div('Get User', 'get', '/user', {
     query: [
       {
         key: 'settings',
@@ -14,7 +11,7 @@ exports.content = [
     ],
   }),
 
-  generator('Update User', 'patch', '/account', {
+  div('Update User', 'patch', '/user', {
     body: [
       {
         key: 'name',
@@ -27,7 +24,7 @@ exports.content = [
     ],
   }),
 
-  generator('Delete User', 'delete', '/account', {
+  div('Delete User', 'delete', '/user', {
     body: [
       {
         key: 'password',
@@ -37,14 +34,13 @@ exports.content = [
     ],
   }),
 
-  generator('Change Thene', 'patch', '/account/change-theme', {
+  div('Change Thene', 'patch', '/user/change-theme', {
     body: [
       {
         key: 'theme',
         type: String,
         des: 'Light/Dark',
       },
-      // TODO: @nazmussayad
       {
         key: 'hue',
         type: Number,
@@ -53,7 +49,7 @@ exports.content = [
     ],
   }),
 
-  generator('Add Task Category', 'post', '/account/task-category', {
+  div('Add Task Category', 'post', '/user/task-category', {
     body: [
       {
         key: 'name',
@@ -69,28 +65,19 @@ exports.content = [
     ],
   }),
 
-  generator(
-    'Update Task Category',
-    'patch',
-    '/account/task-category/{category_id}',
-    {
-      body: [
-        {
-          key: 'name',
-          type: String,
-        },
-        {
-          key: 'hue',
-          type: Number,
-          des: 'between 0-360',
-        },
-      ],
-    }
-  ),
+  div('Update Task Category', 'patch', '/user/task-category/{category_id}', {
+    body: [
+      {
+        key: 'name',
+        type: String,
+      },
+      {
+        key: 'hue',
+        type: Number,
+        des: 'between 0-360',
+      },
+    ],
+  }),
 
-  generator(
-    'Delete Task Category',
-    'delete',
-    '/account/task-category/{category_id}'
-  ),
+  div('Delete Task Category', 'delete', '/user/task-category/{category_id}'),
 ]

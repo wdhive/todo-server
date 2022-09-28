@@ -13,6 +13,7 @@ exports.findAndSetTaskCategoryMiddleware = async (req, res, next) => {
     throw new ReqError('No category found with this id')
   }
   req.userSettingsCategory = category
+  next()
 }
 
 exports.addTaskCategory = async (req, res) => {
@@ -39,10 +40,7 @@ exports.deleteTaskCategory = async (req, res) => {
 
 exports.changeTheme = async (req, res) => {
   const themeBody = req.getFields('theme hue')
-
-  if (themeBody.theme) req.userSettings.theme = themeBody.theme
-  if (themeBody.hue) req.userSettings.hue = themeBody.hue
-
+  req.userSettings.set(themeBody)
   const newSettings = await req.userSettings.save()
   res.success({
     theme: newSettings.theme,

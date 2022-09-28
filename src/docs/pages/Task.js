@@ -1,12 +1,10 @@
-const generator = require('../generator')
-
 exports.title = 'Task'
 exports.description = 'This page covers everything related to Task'
 
 exports.content = [
-  generator('Get All Tasks', 'get', '/tasks'),
+  div('Get All Tasks', 'get', '/tasks'),
 
-  generator('Create Task', 'post', '/tasks', {
+  div('Create Task', 'post', '/tasks', {
     body: [
       {
         key: 'title',
@@ -25,7 +23,7 @@ exports.content = [
     ],
   }),
 
-  generator('Update Task', 'patch', '/tasks/{task_id}', {
+  div('Update Task', 'patch', '/tasks/{task_id}', {
     body: [
       {
         key: 'title',
@@ -42,7 +40,7 @@ exports.content = [
     ],
   }),
 
-  generator('Add Category', 'post', '/tasks/{task_id}/category', {
+  div('Add Category', 'post', '/tasks/{task_id}/category', {
     body: [
       {
         key: 'category',
@@ -53,13 +51,9 @@ exports.content = [
     ],
   }),
 
-  generator(
-    'Delete Category',
-    'delete',
-    '/tasks/{task_id}/category/{category_id}'
-  ),
+  div('Delete Category', 'delete', '/tasks/{task_id}/category/{category_id}'),
 
-  generator('Invite Participants', 'post', '/tasks/{task_id}/participants', {
+  div('Invite Participants', 'post', '/tasks/{task_id}/participants', {
     body: [
       {
         key: 'user',
@@ -70,13 +64,9 @@ exports.content = [
     ],
   }),
 
-  generator(
-    'Remove Participant',
-    'delete',
-    '/tasks/{task_id}/participants/{user}'
-  ),
+  div('Remove Participant', 'delete', '/tasks/{task_id}/participants/{user}'),
 
-  generator(
+  div(
     'Change Participant Role',
     'patch',
     '/tasks/{task_id}/participants/{user}',

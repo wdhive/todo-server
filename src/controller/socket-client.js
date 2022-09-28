@@ -1,6 +1,6 @@
-const socketStore = require('../../socket/socket-store')
-const User = require('../../model/user-model')
-const jwtToken = require('../../utils/jwt-token')
+const socketStore = require('../socket/socket-store')
+const User = require('../model/user-model')
+const jwtToken = require('../utils/jwt-token')
 
 const events = {
   task: {

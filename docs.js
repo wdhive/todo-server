@@ -1,5 +1,6 @@
 console.clear()
 const fs = require('fs')
+global.div = require('./src/docs/generator')
 console.log('Compilation started...')
 
 const rootDirPath = __dirname + '/src/docs/pages'

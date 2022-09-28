@@ -1,7 +1,7 @@
 const { USER_PUBLIC_INFO } = require('../../config/config')
-const { usersExists } = require('../account/utils')
+const { usersExists } = require('../user/utils')
 
-exports.taskPopulater = [
+exports.populateParticipants = [
   {
     path: 'participants',
     populate: {
@@ -15,7 +15,7 @@ exports.taskPopulater = [
   },
 ]
 
-exports.getAllTaskFilter = userId => {
+exports.getUsersAllTaskFilter = userId => {
   return {
     $or: [
       { owner: userId },
@@ -31,7 +31,7 @@ exports.getAllTaskFilter = userId => {
   }
 }
 
-exports.checkParticipants = async taskBody => {
+exports.sanitizeParticipant = async taskBody => {
   const list = taskBody.participants
   if (!list) return
   const userIds = []

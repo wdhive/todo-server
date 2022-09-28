@@ -1,6 +1,6 @@
 const socketStore = require('../../socket/socket-store')
 const errorMessages = require('../../utils/error-messages')
-const { sendUserAndJWT } = require('./utils')
+const { sendJWT } = require('../account/utils')
 
 exports.changeEmailAndUsername = field => async (req, res) => {
   const newDetails = req.body['new_' + field]
@@ -15,7 +15,9 @@ exports.changeEmailAndUsername = field => async (req, res) => {
     socketStore.disconnect(req, {
       cause: 'Password change',
     })
-    return sendUserAndJWT(res, req.user._id)
+    sendJWT(res, req.user._id)
+
+    return
   }
 
   res.success({ user: req.user.getSafeInfo() })

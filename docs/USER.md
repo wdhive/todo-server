@@ -9,7 +9,7 @@ This page covers everything related to user
 ### Get User
 
 ```http
-GET /account
+GET /user
 ```
 
 |Query|Type|Description|
@@ -21,7 +21,7 @@ GET /account
 ### Update User
 
 ```http
-PATCH /account
+PATCH /user
 ```
 
 |Body|Type|Description|
@@ -34,7 +34,7 @@ PATCH /account
 ### Delete User
 
 ```http
-DELETE /account
+DELETE /user
 ```
 
 |Body|Type|Description|
@@ -46,7 +46,7 @@ DELETE /account
 ### Change Thene
 
 ```http
-PATCH /account/change-theme
+PATCH /user/change-theme
 ```
 
 |Body|Type|Description|
@@ -59,7 +59,7 @@ PATCH /account/change-theme
 ### Add Task Category
 
 ```http
-POST /account/task-category
+POST /user/task-category
 ```
 
 |Body|Type|Description|
@@ -72,7 +72,7 @@ POST /account/task-category
 ### Update Task Category
 
 ```http
-PATCH /account/task-category/{category_id}
+PATCH /user/task-category/{category_id}
 ```
 
 |Body|Type|Description|
@@ -85,6 +85,6 @@ PATCH /account/task-category/{category_id}
 ### Delete Task Category
 
 ```http
-DELETE /account/task-category/{category_id}
+DELETE /user/task-category/{category_id}
 ```
 
