@@ -70,14 +70,14 @@ POST /tasks/{task_id}/participants
 
 |Body|Type|Description|
 | :-------- | :------- | :------- |
-| `participant`* | `string` | Participant Id |
+| `user`* | `string` | Participant Id |
 
 ## 
 
 ### Remove Participant
 
 ```http
-DELETE /tasks/{task_id}/participants/{participantId}
+DELETE /tasks/{task_id}/participants/{user}
 ```
 
 ## 
@@ -85,10 +85,10 @@ DELETE /tasks/{task_id}/participants/{participantId}
 ### Change Participant Role
 
 ```http
-PATCH /tasks/{task_id}/participants/{participantId}
+PATCH /tasks/{task_id}/participants/{user}
 ```
 
 |Body|Type|Description|
 | :-------- | :------- | :------- |
-| `role` | `string` | admin | mod | assigner |
+| `role` | `string` | admin | moderator | assigner |
 
