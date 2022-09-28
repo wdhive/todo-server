@@ -49,7 +49,7 @@ exports.createTask = async (req, res) => {
 }
 
 exports.updateTask = async (req, res) => {
-  if (!req.task.isMod(req.user)) {
+  if (!req.task.moderator(req.user)) {
     if (req.task.isAssigner(req.user)) {
       taskBody = getFeildsFromObject(taskBody, 'completed')
     } else throw new ReqError('You do not have permission to update this task')

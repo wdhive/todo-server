@@ -62,7 +62,7 @@ exports.content = [
   generator('Invite Participants', 'post', '/tasks/{task_id}/participants', {
     body: [
       {
-        key: 'participant',
+        key: 'user',
         type: String,
         required: true,
         des: 'Participant Id',
@@ -73,20 +73,20 @@ exports.content = [
   generator(
     'Remove Participant',
     'delete',
-    '/tasks/{task_id}/participants/{participantId}'
+    '/tasks/{task_id}/participants/{user}'
   ),
 
   generator(
     'Change Participant Role',
     'patch',
-    '/tasks/{task_id}/participants/{participantId}',
+    '/tasks/{task_id}/participants/{user}',
     {
       body: [
         {
           key: 'role',
           type: String,
           require: true,
-          des: 'admin | mod | assigner',
+          des: 'admin | moderator | assigner',
         },
       ],
     }

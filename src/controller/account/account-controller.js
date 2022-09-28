@@ -14,7 +14,7 @@ const {
 } = require('./utils')
 
 exports.checkAuthMiddleware = async (req, res, next) => {
-  const [token] = req.headers.authorization?.match(/\S*$/)
+  const [token] = req.headers.authorization?.match(/\S*$/) || []
   const tokenInfo = jwtToken.verify(token)
   const user = await User.findById(tokenInfo.id)
 
