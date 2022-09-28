@@ -50,10 +50,9 @@ exports.checkParticipants = async taskBody => {
     throw new ReqError('Duplicate input')
   }
 
-  // DANGER:
-  // if (!(await usersExists(userIds))) {
-  //   throw new ReqError('All the users does not exists')
-  // }
+  if (!(await usersExists(userIds))) {
+    throw new ReqError('All the users does not exists')
+  }
 
   return okList
 }
