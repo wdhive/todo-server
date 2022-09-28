@@ -1,6 +1,8 @@
 const mongoose = require('mongoose')
 const jwtToken = require('../../utils/jwt-token')
 const User = require('../../model/user-model')
+const errorMessages = require('../../utils/error-messages')
+const generateOtp = require('../../utils/generate-otp')
 
 exports.sendUserAndJWT = (res, user) => {
   const userMode =
@@ -17,17 +19,16 @@ exports.getFindUserQuery = login => {
   return login.includes('@') ? { email: login } : { username: login }
 }
 
-exports.createOrUpdateCode = async (doc, model, data) => {
-  if (doc) {
-    for (let key in data) doc[key] = data[key]
-    await doc.save()
-  } else {
-    await model.create(data)
-  }
-}
-
 exports.usersExists = async userIds => {
   const uniqueUserIds = [...new Set(userIds)]
   const usersCount = await User.find({ _id: uniqueUserIds }).countDocuments()
   return uniqueUserIds.length === usersCount
+}
+
+exports.validateOtpRequest = async (Model, findQuery, code) => {
+  const otpRequest = await Model.findOne(findQuery)
+  if (!otpRequest) throw new ReqError(errorMessages.otp.notExists)
+  if (!(await otpRequest.checkCode(code))) {
+    throw new ReqError(errorMessages.otp.wrong)
+  }
 }

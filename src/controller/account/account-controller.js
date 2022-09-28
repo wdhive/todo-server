@@ -1,4 +1,5 @@
 const User = require('../../model/user-model')
+const UserSettings = require('../../model/user-settings-model')
 const VerifyEmail = require('../../model/otp-verify-email-model')
 const ForgetPass = require('../../model/otp-forget-pass-model')
 const generateOtp = require('../../utils/generate-otp')
@@ -9,7 +10,7 @@ const accountFactory = require('./account-factory')
 const {
   sendUserAndJWT,
   getFindUserQuery,
-  createOrUpdateCode,
+  validateOtpRequest,
 } = require('./utils')
 
 exports.checkAuthMiddleware = async (req, res, next) => {
@@ -35,37 +36,70 @@ exports.checkPassAfterSignedinMiddleWare = async (req, res, next) => {
   next()
 }
 
-exports.verifyEmailOtpMiddleware = async (req, res, next) => {
-  const { email, code } = req.body
-  const verifyEmailRequest = await VerifyEmail.findOne({ email })
-  if (!verifyEmailRequest) {
-    throw new ReqError(errorMessages.otp.notExists)
-  }
-  if (!(await verifyEmailRequest.checkCode(code))) {
-    throw new ReqError(errorMessages.otp.wrong)
-  }
-  next()
-}
-
-exports.requestEmailVerify = async (req, res) => {
+exports.emailVerifyMiddleWare = async (req, res, next) => {
   const { email } = req.body
   if (await User.findOne({ email }).countDocuments()) {
     throw new ReqError(errorMessages.email.duplicate)
   }
+  req.otpType = 'verify-email'
+  next()
+}
 
-  const code = generateOtp(6)
-  await createOrUpdateCode(await VerifyEmail.findOne({ email }), VerifyEmail, {
-    email,
-    code,
+exports.forgetPasswordMiddleWare = async (req, res, next) => {
+  const { login } = req.body
+  const user = await User.findOne(getFindUserQuery(login)).select('email')
+  res.success({
+    email: user.email,
+    message: `Email sent to your email. (if the any user exists)`,
   })
-  sendMail.verifyEmailCode(email, code).catch(() => {})
 
-  res.success({ email }, 201)
+  if (!user) return
+  req.user = user
+  req.otpType = 'forget-password'
+  next()
+}
+
+exports.verifyEmailOtpMiddleware = async (req, res, next) => {
+  const { email, code } = req.body
+  await validateOtpRequest(VerifyEmail, { email }, code)
+  next()
+}
+
+exports.sendOtpMail = async (req, res) => {
+  const emailMode = req.otpType === 'verify-email'
+
+  const Model = emailMode ? VerifyEmail : ForgetPass
+  const findQuery = emailMode
+    ? { email: req.body.email }
+    : { _id: req.user._id }
+
+  const request = await Model.findOne(findQuery)
+  const email = emailMode ? req.body.email : req.user.email
+  const code = generateOtp(emailMode ? 6 : 8)
+
+  if (request) {
+    request.code = code
+    await request.save()
+  } else {
+    const data = {
+      _id: req.user?._id,
+      email,
+      code,
+    }
+    await Model.create(data)
+  }
+
+  res.headersSent || res.success({ email }, 201)
+  await sendMail.verifyEmailCode(email, code)
 }
 
 exports.signup = async (req, res) => {
   const reqBody = req.getBody('name email username image password')
   const user = await User.create(reqBody)
+  await UserSettings.create({
+    _id: user._id,
+  })
+
   sendUserAndJWT(res, user)
 }
 
@@ -80,40 +114,16 @@ exports.login = async (req, res) => {
   sendUserAndJWT(res, user)
 }
 
-exports.forgetPassword = async (req, res) => {
-  const { login } = req.body
-  const user = await User.findOne(getFindUserQuery(login)).select('email')
-
-  res.success({
-    email,
-    message: `Email sent to your email, if the any user exists with the email`,
-  })
-
-  if (!user) return
-
-  const userId = user?._id
-  try {
-    const existingRequest = await ForgetPass.findById(userId)
-    const code = generateOtp(8)
-    await createOrUpdateCode(existingRequest, ForgetPass, { _id: userId, code })
-    await sendMail.forgetPassCode(user.email, code)
-  } catch {}
-}
-
 exports.resetPassword = async (req, res) => {
   const { login, code, new_password } = req.body
   const user = await User.findOne(getFindUserQuery(login))
-  if (!user) throw new ReqError(errorMessages.user.notFound)
 
-  const forgetPassRequest = await ForgetPass.findById(user._id)
-  if (!forgetPassRequest) throw new ReqError(errorMessages.otp.notExists)
-  if (!(await forgetPassRequest.checkCode(code))) {
-    throw new ReqError(errorMessages.otp.wrong)
-  }
+  if (!user) throw new ReqError(errorMessages.user.notFound)
+  await validateOtpRequest(ForgetPass, { _id: user._id }, code)
 
   user.password = new_password
   await user.save()
-  await forgetPassRequest.delete()
+  await otpRequest.delete()
   sendUserAndJWT(res, user)
 }
 

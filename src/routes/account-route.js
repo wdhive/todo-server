@@ -6,14 +6,22 @@ const [userController, accountController, settingsController] = ReqError.catch(
   require('../controller/account/settings-controller')
 )
 
-router.post('/request-email-verify', accountController.requestEmailVerify)
+router.post(
+  '/request-email-verify',
+  accountController.emailVerifyMiddleWare,
+  accountController.sendOtpMail
+)
 router.post(
   '/signup',
   accountController.verifyEmailOtpMiddleware,
   accountController.signup
 )
 router.post('/login', accountController.login)
-router.post('/password-forget', accountController.forgetPassword)
+router.post(
+  '/password-forget',
+  accountController.forgetPasswordMiddleWare,
+  accountController.sendOtpMail
+)
 router.post('/password-reset', accountController.resetPassword)
 
 // Now every request needs to be logged in

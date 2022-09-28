@@ -3,10 +3,6 @@ const UserSettings = require('../../model/user-settings-model')
 
 exports.getSettingsMiddleware = async (req, res, next) => {
   let settings = await UserSettings.findById(req.user._id)
-  if (!settings) {
-    settings = await UserSettings.create({ _id: req.user._id })
-  }
-
   req.userSettings = settings
   next()
 }
