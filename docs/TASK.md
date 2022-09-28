@@ -50,7 +50,7 @@ POST /tasks/{task_id}/category
 
 |Body|Type|Description|
 | :-------- | :------- | :------- |
-| `category` | `string` | Category ID |
+| `category`* | `string` | Category ID |
 
 ## 
 
@@ -90,5 +90,5 @@ PATCH /tasks/{task_id}/participants/{user}
 
 |Body|Type|Description|
 | :-------- | :------- | :------- |
-| `role` | `string` | admin | moderator | assigner |
+| `role`* | `string` | admin \| moderator \| assigner |
 
