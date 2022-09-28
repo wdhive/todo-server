@@ -38,7 +38,14 @@ exports.deleteTaskCategory = async (req, res) => {
 }
 
 exports.changeTheme = async (req, res) => {
-  req.userSettings.theme = req.body.theme
+  const themeBody = req.getFields('theme hue')
+
+  if (themeBody.theme) req.userSettings.theme = themeBody.theme
+  if (themeBody.hue) req.userSettings.hue = themeBody.hue
+
   const newSettings = await req.userSettings.save()
-  res.success({ theme: newSettings.theme })
+  res.success({
+    theme: newSettings.theme,
+    hue: newSettings.hue,
+  })
 }

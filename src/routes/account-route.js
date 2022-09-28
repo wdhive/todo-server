@@ -1,9 +1,15 @@
 const express = require('express')
 const router = express.Router()
-const [userController, accountController, settingsController] = ReqError.catch(
+const [
+  userController,
+  accountController,
+  settingsController,
+  usersSearchHandler,
+] = ReqError.catch(
   require('../controller/account/user-controller'),
   require('../controller/account/account-controller'),
-  require('../controller/account/settings-controller')
+  require('../controller/account/settings-controller'),
+  require('../controller/account/users-search-handler')
 )
 
 router.post(
@@ -35,6 +41,8 @@ router
     accountController.checkPassAfterSignedinMiddleWare,
     userController.deleteUser
   )
+
+router.get('/search', usersSearchHandler)
 
 router
   .route('/task-category')

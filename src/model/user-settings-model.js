@@ -1,5 +1,12 @@
 const mongoose = require('mongoose')
 
+const hueSchema = {
+  type: Number,
+  required: true,
+  min: 0,
+  max: 360,
+}
+
 const userSettingsSchema = mongoose.Schema(
   {
     theme: {
@@ -8,6 +15,8 @@ const userSettingsSchema = mongoose.Schema(
       enum: ['dark', 'light'],
     },
 
+    hue: hueSchema,
+
     taskCategories: [
       {
         name: {
@@ -15,12 +24,7 @@ const userSettingsSchema = mongoose.Schema(
           required: true,
           match: [/^[a-zA-Z 0-9]+$/, 'Please insert a valid name'],
         },
-        hue: {
-          type: Number,
-          required: true,
-          min: 0,
-          max: 360,
-        },
+        hue: hueSchema,
       },
     ],
   },

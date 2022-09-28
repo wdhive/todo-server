@@ -2,11 +2,9 @@ const mongoose = require('mongoose')
 const jwtToken = require('../../utils/jwt-token')
 const User = require('../../model/user-model')
 const errorMessages = require('../../utils/error-messages')
-const generateOtp = require('../../utils/generate-otp')
 
 exports.sendUserAndJWT = (res, user) => {
-  const userMode =
-    !(user instanceof mongoose.Types.ObjectId) && user instanceof Object
+  const userMode = !(user instanceof mongoose.Types.ObjectId)
 
   const token = jwtToken.generate(userMode ? user._id : user)
   const data = { token }
