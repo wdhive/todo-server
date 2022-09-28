@@ -3,7 +3,7 @@ const { usersExists } = require('../account/utils')
 
 exports.taskPopulater = [
   {
-    path: 'pendingParticipants activeParticipants',
+    path: 'participants',
     populate: {
       path: 'user',
       select: USER_PUBLIC_INFO,
@@ -20,9 +20,10 @@ exports.getAllTaskFilter = userId => {
     $or: [
       { owner: userId },
       {
-        pendingParticipants: {
+        participants: {
           $elemMatch: {
             user: userId,
+            active: true,
           },
         },
       },
@@ -30,20 +31,29 @@ exports.getAllTaskFilter = userId => {
   }
 }
 
-exports.validateParticipants = async list => {
+exports.checkParticipants = async taskBody => {
+  const list = taskBody.participants
   if (!list) return
+  const userIds = []
 
-  const userIds = list.map(({ user }) => {
-    if (user && typeof user === 'string') return user
-    throw new ReqError('Invalid input')
+  const okList = list.map(participants => {
+    if (participants.user.toString() === taskBody.owner.toString()) {
+      throw new ReqError('You can not invite the owner for a task')
+    }
+
+    userIds.push(participants.user)
+    participants.active = false
+    return participants
   })
 
-  const uniqueUserIds = new Set(userIds)
-  if (uniqueUserIds.size !== userIds.length) {
+  if (new Set(userIds).size !== userIds.length) {
     throw new ReqError('Duplicate input')
   }
 
-  if (!(await usersExists(userIds))) {
-    throw new ReqError('All the users does not exists')
-  }
+  // DANGER:
+  // if (!(await usersExists(userIds))) {
+  //   throw new ReqError('All the users does not exists')
+  // }
+
+  return okList
 }

@@ -14,6 +14,11 @@ const participantSchema = mongoose.Schema(
       default: 'assigner',
       required: true,
     },
+    active: {
+      type: Boolean,
+      default: false,
+      required: true,
+    },
   },
   { versionKey: false }
 )
@@ -50,8 +55,7 @@ const taskSchema = mongoose.Schema(
     endingDate: {
       type: Date,
     },
-    activeParticipants: [participantSchema],
-    pendingParticipants: [participantSchema],
+    participants: [participantSchema],
   },
   { versionKey: false }
 )
@@ -67,29 +71,17 @@ taskSchema.pre('save', function (next) {
 })
 
 taskSchema.methods.getAllParticipants = function () {
-  const allParticipants = this.activeParticipants.map(({ user }) =>
-    user.toString()
-  )
-  const pendingParticipants = this.pendingParticipants.map(({ user }) =>
-    user.toString()
-  )
-  const mixedArray = [
-    this.owner.toString(),
-    allParticipants,
-    pendingParticipants,
-  ].flat()
-
+  const participants = this.participants.map(({ user }) => user.toString())
+  const mixedArray = [this.owner.toString(), participants].flat()
   return Array.from(new Set(mixedArray))
 }
 
 const hasPermission = roles => {
   return function (user) {
     const userId = user._id.toString()
-
     if (this.owner.toString() === userId) return true
-
-    return this.activeParticipants.some(({ user, role }) => {
-      if (user.toString() === userId && roles.includes(role)) return true
+    return this.participants.some(({ user, role, active }) => {
+      return user.toString() === userId && active && roles.includes(role)
     })
   }
 }

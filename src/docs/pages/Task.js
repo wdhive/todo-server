@@ -19,7 +19,7 @@ exports.content = [
         type: String,
       },
       {
-        key: 'pendingParticipants',
+        key: 'participants',
         type: Array,
       },
     ],
@@ -65,7 +65,7 @@ exports.content = [
         key: 'participant',
         type: String,
         required: true,
-        des: 'i am confused just as much as you',
+        des: 'Participant Id',
       },
     ],
   }),

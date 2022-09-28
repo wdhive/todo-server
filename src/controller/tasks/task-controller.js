@@ -7,12 +7,12 @@ const { getFeildsFromObject } = require('../../utils')
 const {
   taskPopulater,
   getAllTaskFilter,
-  validateParticipants,
+  checkParticipants,
 } = require('./utils')
 
 exports.setTaskParticipantsMiddleWare = async (req, res, next) => {
   const task = await Task.findById(req.params.taskId).select(
-    'owner pendingParticipants activeParticipants'
+    'owner participants'
   )
   if (!task) throw new ReqError('No task found', 404)
   req.task = task
@@ -35,11 +35,11 @@ exports.getAllTask = async (req, res) => {
 
 exports.createTask = async (req, res) => {
   const taskBody = req.getBody(
-    'title description startingDate endingDate pendingParticipants'
+    'title description startingDate endingDate participants'
   )
-  await validateParticipants(taskBody.pendingParticipants)
-  
   taskBody.owner = req.user._id
+  taskBody.participants = await checkParticipants(taskBody)
+
   const task = await (await Task.create(taskBody)).populate(taskPopulater)
   socketStore.send(
     req,
@@ -48,7 +48,6 @@ exports.createTask = async (req, res) => {
   )
 }
 
-// (Role + Permission) kahini
 exports.updateTask = async (req, res) => {
   if (!req.task.isMod(req.user)) {
     if (req.task.isAssigner(req.user)) {
@@ -69,15 +68,11 @@ exports.updateTask = async (req, res) => {
   }
 
   const updatedTask = await (await req.task.save()).populate(taskPopulater)
-  const taskCategories = await TaskCategory.find({
-    user: req.user._id,
-    task: [updatedTask._id],
-  })
 
   socketStore.send(
     req,
     TaskSocketClient.events.task.update,
-    res.success({ task: updatedTask, taskCategories })
+    res.success({ task: updatedTask })
   )
 }
 
@@ -87,14 +82,14 @@ exports.deleteTask = async (req, res) => {
   }
   await req.task.delete()
   await TaskCategory.deleteMany({ task: req.task._id })
-  const allParticipants = req.task.getAllParticipants()
+  const participants = req.task.getAllParticipants()
 
   socketStore.send(
     req,
     TaskSocketClient.events.task.delete,
     res.success({ taskId: req.task._id }, 204),
     {
-      rooms: allParticipants,
+      rooms: participants,
     }
   )
 }
