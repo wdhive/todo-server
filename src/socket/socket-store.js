@@ -6,6 +6,15 @@ class SocketStore {
   #globalIo
   #store = {}
 
+  events = {
+    task: {
+      update: 'task-update',
+      delete: 'task-delete',
+      invite: 'task-invitation',
+      accept: 'task-invitation-accept',
+    },
+  }
+
   initGlobalIo(globalIo) {
     this.#globalIo = globalIo
   }
@@ -48,7 +57,14 @@ class SocketStore {
       roomOrReq,
       options
     )
+
     this.#send(rooms, event, data, excludeSocket)
+  }
+
+  #send(rooms, event, data, excludeSocket) {
+    this.#exceptSocket(rooms, excludeSocket, client => {
+      client.socket.emit(event, data)
+    })
   }
 
   #cleanRoomIfEmpty(roomId) {
@@ -56,12 +72,6 @@ class SocketStore {
     if (!Object.keys(this.#store[roomId]).length) {
       delete this.#store[roomId]
     }
-  }
-
-  #send(rooms, event, data, excludeSocket) {
-    this.#exceptSocket(rooms, excludeSocket, client => {
-      client.socket.emit(event, data)
-    })
   }
 
   #getRoomsAndExcludeSocket(roomOrReq, { exclude, rooms }) {

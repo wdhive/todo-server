@@ -10,23 +10,12 @@ const jwtToken = require('../../utils/jwt-token')
 const { sendJWT, getFindUserQuery, checkOtpRequest } = require('./utils')
 
 exports.checkAuth = async (req, res, next) => {
-  const [token] = req.headers.authorization?.match(/\S*$/) || []
-  const tokenInfo = jwtToken.verify(token)
-  const user = await User.findById(tokenInfo.id)
-
-  if (!user) {
-    throw new ReqError(errorMessages.user.deleted)
-  }
-  if (user.passwordChangedAfter(token.iat)) {
-    throw new ReqError(errorMessages.auth.jwtExpire)
-  }
-
+  const user = await jwtToken.verifyUser(req.headers.authorization)
   req.user = user
   next()
 }
 
 exports.checkPassAfterLoggedIn = async (req, res, next) => {
-  if (!req.body.password) throw new ReqError('Must provide a password')
   const ok = await req.user.checkPassword(req.body.password)
   if (!ok) throw new ReqError(errorMessages.password.wrong)
   next()

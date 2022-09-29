@@ -13,33 +13,40 @@ const [
 )
 
 router.use(accountController.checkAuth)
-
-router.route('/').get(taskController.getAllTask).post(taskController.createTask)
-
 router.get('/search', taskSearchHandler)
+
+// Task CRUD
+router
+  .route('/')
+  .get(taskController.getAllTask)
+  .post(taskController.createTask, taskController.saveAndSendTask)
 
 router
   .route('/:taskId')
-  .all(taskController.setTaskParticipants)
-  .patch(taskController.updateTask)
+  .all(taskController.setTaskActiveParticipants)
+  .patch(taskController.updateTask, taskController.saveAndSendTask)
   .delete(taskController.deleteTask)
 
 router.post('/:taskId/category', taskController.addCategory)
 router.delete('/:taskId/category/:categoryId', taskController.removeCategory)
 
-router
-  .route('/:taskId/participants')
-  .all(taskController.setTaskParticipants, taskController.restrictedToOwner)
-  .post(participantController.inviteUser)
+// Task Participant
+router.use('/:taskId/*', taskController.setTaskAllParticipants)
+router.post(
+  '/:taskId/invitation-accept',
+  participantController.acceptUser,
+  taskController.saveAndSendTask
+)
 
+router.use(taskController.restrictedToOwner)
+router.post(
+  '/:taskId/participants',
+  participantController.inviteUser,
+  taskController.saveAndSendTask
+)
 router
   .route('/:taskId/participants/:userId')
-  .all(taskController.setTaskParticipants, taskController.restrictedToOwner)
-  .delete(participantController.removeUser)
-  .patch(participantController.changeRole)
-
-router
-  .route('/:taskId/participant-accept')
-  .post(taskController.setTaskParticipants, participantController.acceptUser)
+  .delete(participantController.removeUser, taskController.saveAndSendTask)
+  .patch(participantController.changeRole, taskController.saveAndSendTask)
 
 module.exports = router

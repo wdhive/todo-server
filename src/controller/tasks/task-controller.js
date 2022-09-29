@@ -1,6 +1,7 @@
 const Task = require('../../model/task-model')
 const TaskCategory = require('../../model/task-category-model')
 const UserSettings = require('../../model/user-settings-model')
+const taskFactory = require('./task-factory')
 const {
   populateParticipants,
   getUsersAllTaskFilter,
@@ -12,19 +13,11 @@ exports.restrictedToOwner = (req, res, next) => {
   if (!req.task.isOwner(req.user._id)) {
     throw new ReqError('You need to be the owner to remove a user')
   }
-
   next()
 }
 
-exports.setTaskParticipants = async (req, res, next) => {
-  const task = await Task.findOne(
-    getUsersTaskFilter(req.params.taskId, req.user._id)
-  ).select('owner participants')
-
-  if (!task) throw new ReqError('No task found', 404)
-  req.task = task
-  next()
-}
+exports.setTaskActiveParticipants = taskFactory.setTaskParticipants(true)
+exports.setTaskAllParticipants = taskFactory.setTaskParticipants(false)
 
 exports.getAllTask = async (req, res) => {
   const queryScript = getUsersAllTaskFilter(req.user._id)
@@ -40,21 +33,18 @@ exports.getAllTask = async (req, res) => {
   res.success({ totalTasks, tasks, taskCategories })
 }
 
-exports.createTask = async (req, res) => {
+exports.createTask = async (req, res, next) => {
   const taskBody = req.getBody(
     'title description startingDate endingDate participants'
   )
   taskBody.owner = req.user._id
   taskBody.participants = await sanitizeParticipant(taskBody)
 
-  const task = await (
-    await Task.create(taskBody)
-  ).populate(populateParticipants)
-
-  res.success({ task }, 201)
+  req.task = new Task(taskBody)
+  next()
 }
 
-exports.updateTask = async (req, res) => {
+exports.updateTask = async (req, res, next) => {
   let taskBody = req.getBody(
     'title description startingDate endingDate completed'
   )
@@ -67,11 +57,8 @@ exports.updateTask = async (req, res) => {
     }
   }
 
-  const updatedTask = await (
-    await req.task.set(taskBody).save()
-  ).populate(populateParticipants)
-
-  res.success({ task: updatedTask })
+  req.task.set(taskBody)
+  next()
 }
 
 exports.deleteTask = async (req, res) => {
@@ -133,4 +120,10 @@ exports.removeCategory = async (req, res) => {
     category: req.params.categoryId,
   })
   res.success(null, 204)
+}
+
+exports.saveAndSendTask = async (req, res) => {
+  const savedTask = await req.task.save()
+  const task = await savedTask.populate(populateParticipants)
+  res.success({ task })
 }

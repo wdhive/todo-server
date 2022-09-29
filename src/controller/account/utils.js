@@ -13,7 +13,6 @@ exports.getFindUserQuery = login => {
 
 exports.checkOtpRequest = async (Model, findQuery, code) => {
   const otpRequest = await Model.findOne(findQuery)
-  console.log(findQuery, otpRequest)
 
   if (!otpRequest) throw new ReqError(errorMessages.otp.notExists)
   if (!(await otpRequest.checkCode(code))) {

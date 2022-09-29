@@ -1,23 +1,12 @@
 const socketStore = require('../socket/socket-store')
-const User = require('../model/user-model')
 const jwtToken = require('../utils/jwt-token')
 
 module.exports = class TaskSocketClient {
-  static events = this.events
-  events = {
-    task: {
-      update: 'task-update',
-      delete: 'task-delete',
-      invite: 'task-invitation',
-      accept: 'task-invitation-accept',
-    },
-  }
-
   static async checkAuth(socket) {
-    const [token] = socket?.handshake?.auth?.authorization?.match(/\S*$/)
-    const tokenInfo = jwtToken.verify(token)
-    const user = await User.findById(tokenInfo.id)
-    if (!user) throw new Error('Invalid User')
+    const user = await jwtToken.verifyUser(
+      socket?.handshake?.auth?.authorization
+    )
+
     return user
   }
 

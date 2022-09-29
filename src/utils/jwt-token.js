@@ -1,4 +1,5 @@
 const jsonwebtoken = require('jsonwebtoken')
+const User = require('../model/user-model')
 const errorMessages = require('./error-messages')
 
 exports.generate = id => {
@@ -18,4 +19,19 @@ exports.verify = token => {
 
 exports.decode = token => {
   return jsonwebtoken.decode(token, {})
+}
+
+exports.verifyUser = async rawToken => {
+  const [token] = rawToken?.match(/(?<=^Bearer ).*$/) || []
+  const tokenInfo = this.verify(token)
+  const user = await User.findById(tokenInfo.id)
+
+  if (!user) {
+    throw new ReqError(errorMessages.user.deleted)
+  }
+  if (user.passwordChangedAfter(token.iat)) {
+    throw new ReqError(errorMessages.auth.jwtExpire)
+  }
+
+  return user
 }

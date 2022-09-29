@@ -15,30 +15,26 @@ exports.populateParticipants = [
   },
 ]
 
-const getUsersAllTaskFilter = userId => {
+exports.getUsersAllTaskFilter = (userId, active = true) => {
   return {
     $or: [
       { owner: userId },
       {
         participants: {
-          $elemMatch: {
-            user: userId,
-            active: true,
-          },
+          $elemMatch: { user: userId, active },
         },
       },
     ],
   }
 }
 
-exports.getUsersAllTaskFilter = getUsersAllTaskFilter
-exports.getUsersTaskFilter = (taskId, userId) => {
+exports.getUsersTaskFilter = (taskId, userId, active) => {
   return {
     $and: [
       {
         _id: taskId,
       },
-      getUsersAllTaskFilter(userId),
+      this.getUsersAllTaskFilter(userId, active),
     ],
   }
 }
