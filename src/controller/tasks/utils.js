@@ -15,7 +15,7 @@ exports.populateParticipants = [
   },
 ]
 
-exports.getUsersAllTaskFilter = userId => {
+const getUsersAllTaskFilter = userId => {
   return {
     $or: [
       { owner: userId },
@@ -27,6 +27,18 @@ exports.getUsersAllTaskFilter = userId => {
           },
         },
       },
+    ],
+  }
+}
+
+exports.getUsersAllTaskFilter = getUsersAllTaskFilter
+exports.getUsersTaskFilter = (taskId, userId) => {
+  return {
+    $and: [
+      {
+        _id: taskId,
+      },
+      getUsersAllTaskFilter(userId),
     ],
   }
 }

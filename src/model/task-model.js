@@ -3,7 +3,6 @@ const TaskCategory = require('./task-category-model')
 
 const participantSchema = mongoose.Schema(
   {
-    _id: false,
     user: {
       type: mongoose.Types.ObjectId,
       required: true,
@@ -91,6 +90,9 @@ const hasPermission = roles => {
   }
 }
 
+taskSchema.methods.isOwner = function (userId) {
+  return this.owner.toString() === userId.toString()
+}
 taskSchema.methods.isAdmin = hasPermission(['admin'])
 taskSchema.methods.isModerator = hasPermission(['admin', 'moderator'])
 taskSchema.methods.isAssigner = hasPermission([

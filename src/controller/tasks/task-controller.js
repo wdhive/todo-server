@@ -1,18 +1,26 @@
 const Task = require('../../model/task-model')
 const TaskCategory = require('../../model/task-category-model')
 const UserSettings = require('../../model/user-settings-model')
-const TaskSocketClient = require('../socket-client')
-const socketStore = require('../../socket/socket-store')
 const {
   populateParticipants,
   getUsersAllTaskFilter,
   sanitizeParticipant,
+  getUsersTaskFilter,
 } = require('./utils')
 
+exports.restrictedToOwner = (req, res, next) => {
+  if (!req.task.isOwner(req.user._id)) {
+    throw new ReqError('You need to be the owner to remove a user')
+  }
+
+  next()
+}
+
 exports.setTaskParticipants = async (req, res, next) => {
-  const task = await Task.findById(req.params.taskId).select(
-    'owner participants'
-  )
+  const task = await Task.findOne(
+    getUsersTaskFilter(req.params.taskId, req.user._id)
+  ).select('owner participants')
+
   if (!task) throw new ReqError('No task found', 404)
   req.task = task
   next()
@@ -42,11 +50,8 @@ exports.createTask = async (req, res) => {
   const task = await (
     await Task.create(taskBody)
   ).populate(populateParticipants)
-  socketStore.send(
-    req,
-    TaskSocketClient.events.task.create,
-    res.success({ task }, 201)
-  )
+
+  res.success({ task }, 201)
 }
 
 exports.updateTask = async (req, res) => {
@@ -66,11 +71,7 @@ exports.updateTask = async (req, res) => {
     await req.task.set(taskBody).save()
   ).populate(populateParticipants)
 
-  socketStore.send(
-    req,
-    TaskSocketClient.events.task.update,
-    res.success({ task: updatedTask })
-  )
+  res.success({ task: updatedTask })
 }
 
 exports.deleteTask = async (req, res) => {
@@ -79,18 +80,13 @@ exports.deleteTask = async (req, res) => {
   }
   await req.task.delete()
 
-  socketStore.send(
-    req,
-    TaskSocketClient.events.task.delete,
-    res.success({ taskId: req.task._id }, 204),
-    {
-      rooms: req.task.getAllParticipants(),
-    }
-  )
+  res.success({ taskId: req.task._id }, 204)
 }
 
 exports.addCategory = async (req, res) => {
-  const isTaskExists = await Task.findById(req.params.taskId).countDocuments()
+  const isTaskExists = await Task.findOne(
+    getUsersTaskFilter(req.params.taskId, req.user._id)
+  ).countDocuments()
   if (!isTaskExists) throw new ReqError('Task not exists!')
 
   const isCategoryExists = await UserSettings.find({

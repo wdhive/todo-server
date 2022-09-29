@@ -2,20 +2,16 @@ const socketStore = require('../socket/socket-store')
 const User = require('../model/user-model')
 const jwtToken = require('../utils/jwt-token')
 
-const events = {
-  task: {
-    read: 'task-read',
-    create: 'task-create',
-    delete: 'task-delete',
-    update: 'task-update',
-    complete: 'task-update-complete',
-    unComplete: 'task-update-uncomplete',
-  },
-}
-
 module.exports = class TaskSocketClient {
-  static events = events
-  events = events
+  static events = this.events
+  events = {
+    task: {
+      update: 'task-update',
+      delete: 'task-delete',
+      invite: 'task-invitation',
+      accept: 'task-invitation-accept',
+    },
+  }
 
   static async checkAuth(socket) {
     const [token] = socket?.handshake?.auth?.authorization?.match(/\S*$/)

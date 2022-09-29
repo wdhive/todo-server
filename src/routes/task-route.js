@@ -29,17 +29,17 @@ router.delete('/:taskId/category/:categoryId', taskController.removeCategory)
 
 router
   .route('/:taskId/participants')
-  .all(taskController.setTaskParticipants)
+  .all(taskController.setTaskParticipants, taskController.restrictedToOwner)
   .post(participantController.inviteUser)
 
 router
   .route('/:taskId/participants/:userId')
-  .all(taskController.setTaskParticipants)
+  .all(taskController.setTaskParticipants, taskController.restrictedToOwner)
   .delete(participantController.removeUser)
   .patch(participantController.changeRole)
 
 router
   .route('/:taskId/participant-accept')
-  .post(participantController.acceptUser)
+  .post(taskController.setTaskParticipants, participantController.acceptUser)
 
 module.exports = router
