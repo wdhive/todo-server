@@ -9,15 +9,14 @@ const {
   getUsersTaskFilter,
 } = require('./utils')
 
-exports.restrictedToOwner = (req, res, next) => {
+exports.setTaskFromActiveUsers = taskFactory.setTaskParticipants(true)
+exports.setTaskFromInactiveUsers = taskFactory.setTaskParticipants(false)
+exports.onlyForOwner = (req, res, next) => {
   if (!req.task.isOwner(req.user._id)) {
     throw new ReqError('You need to be the owner to remove a user')
   }
   next()
 }
-
-exports.setTaskActiveParticipants = taskFactory.setTaskParticipants(true)
-exports.setTaskAllParticipants = taskFactory.setTaskParticipants(false)
 
 exports.getAllTask = async (req, res) => {
   const queryScript = getUsersAllTaskFilter(req.user._id)

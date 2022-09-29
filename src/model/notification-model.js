@@ -13,8 +13,6 @@ const notificationSchema = mongoose.Schema(
         'task-invite-accept',
         'task-participant-remove',
         'task-participant-promotion',
-        'task-deadline',
-        'task-deadline-passed',
       ],
     },
   },

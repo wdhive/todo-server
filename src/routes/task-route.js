@@ -23,7 +23,7 @@ router
 
 router
   .route('/:taskId')
-  .all(taskController.setTaskActiveParticipants)
+  .all(taskController.setTaskFromActiveUsers)
   .patch(taskController.updateTask, taskController.saveAndSendTask)
   .delete(taskController.deleteTask)
 
@@ -31,14 +31,14 @@ router.post('/:taskId/category', taskController.addCategory)
 router.delete('/:taskId/category/:categoryId', taskController.removeCategory)
 
 // Task Participant
-router.use('/:taskId/*', taskController.setTaskAllParticipants)
+router.use('/:taskId/*', taskController.setTaskFromInactiveUsers)
 router.post(
   '/:taskId/invitation-accept',
   participantController.acceptUser,
   taskController.saveAndSendTask
 )
 
-router.use(taskController.restrictedToOwner)
+router.use(taskController.onlyForOwner)
 router.post(
   '/:taskId/participants',
   participantController.inviteUser,
