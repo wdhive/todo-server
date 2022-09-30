@@ -1,15 +1,14 @@
 const mongoose = require('mongoose')
 const bcrypt = require('bcrypt')
-const { getFeildsFromObject } = require('../utils')
-const { runOnFieldUpdate } = require('./utils')
 const errorMessages = require('../utils/error-messages')
-const { USER_SAFE_INFO } = require('../config/config')
 const VerifyEmail = require('./otp-verify-email-model')
 const Task = require('./task-model')
 const TaskCategory = require('./task-category-model')
 const UserSettings = require('./user-settings-model')
 const socketStore = require('../socket/socket-store')
 const commonSchemaField = require('./common-schema-field')
+const { USER_SAFE_INFO } = require('../config/config')
+const { getFeildsFromObject } = require('../utils')
 
 const userSchema = mongoose.Schema(
   {
@@ -47,17 +46,16 @@ const userSchema = mongoose.Schema(
   }
 )
 
-userSchema.pre(
-  'save',
-  runOnFieldUpdate('password', async function (next) {
-    this.password = await bcrypt.hash(
-      this.password,
-      +process.env.BCRYPT_SALT_ROUND
-    )
-    this.passwordModifiedAt = Date.now()
-    next()
-  })
-)
+userSchema.pre('save', async function (next) {
+  if (!this.isModified('password')) return next()
+
+  this.password = await bcrypt.hash(
+    this.password,
+    +process.env.BCRYPT_SALT_ROUND
+  )
+  this.passwordModifiedAt = Date.now()
+  next()
+})
 
 userSchema.post('save', async function () {
   VerifyEmail.deleteOne({ email: this.email }).catch(() => {})

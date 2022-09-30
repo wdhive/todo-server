@@ -8,11 +8,11 @@ exports.setSettings = async (req, res, next) => {
 }
 
 exports.setTaskCategory = async (req, res, next) => {
-  const category = req.userSettings.taskCategories.id(req.params.categoryId)
+  const Categories = req.userSettings.taskCategories.id(req.params.categoryId)
   if (!category) {
     throw new ReqError('No category found with this id')
   }
-  req.userSettingsCategory = category
+  req.userSettingsCategories = Categories
   next()
 }
 
@@ -24,15 +24,15 @@ exports.addTaskCategory = async (req, res) => {
 }
 
 exports.updateTaskCategory = async (req, res) => {
-  const category = req.userSettingsCategory
+  const categories = req.userSettingsCategories
   delete req.body._id
-  category.set(req.body)
+  categories.set(req.body)
   await req.userSettings.save()
-  res.success({ category })
+  res.success({ category: categories })
 }
 
 exports.deleteTaskCategory = async (req, res) => {
-  req.userSettingsCategory.remove()
+  req.userSettingsCategories.remove()
   await req.userSettings.save()
   await TaskCategory.deleteMany({ category: req.params.categoryId })
   res.success(null, 204)

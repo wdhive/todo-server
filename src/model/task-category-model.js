@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 
-const userSettingsSchema = mongoose.Schema(
+const taskCategorySchema = mongoose.Schema(
   {
     user: {
       type: mongoose.Types.ObjectId,
@@ -19,4 +19,15 @@ const userSettingsSchema = mongoose.Schema(
   { versionKey: false }
 )
 
-module.exports = mongoose.model('task-category', userSettingsSchema)
+taskCategorySchema.index(
+  {
+    user: 1,
+    category: 1,
+    task: 1,
+  },
+  {
+    unique: true,
+  }
+)
+
+module.exports = mongoose.model('task-category', taskCategorySchema)

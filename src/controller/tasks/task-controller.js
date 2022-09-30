@@ -1,12 +1,10 @@
 const Task = require('../../model/task-model')
 const TaskCategory = require('../../model/task-category-model')
-const UserSettings = require('../../model/user-settings-model')
 const taskFactory = require('./task-factory')
 const {
   populateParticipants,
   getUsersAllTaskFilter,
   sanitizeParticipant,
-  getUsersTaskFilter,
 } = require('./utils')
 
 exports.setTaskFromActiveUsers = taskFactory.setTaskParticipants(true)
@@ -67,58 +65,6 @@ exports.deleteTask = async (req, res) => {
   await req.task.delete()
 
   res.success({ taskId: req.task._id }, 204)
-}
-
-exports.addCategory = async (req, res) => {
-  const isTaskExists = await Task.findOne(
-    getUsersTaskFilter(req.params.taskId, req.user._id)
-  ).countDocuments()
-  if (!isTaskExists) throw new ReqError('Task not exists!')
-
-  const isCategoryExists = await UserSettings.find({
-    $and: [
-      {
-        _id: req.user._id,
-      },
-      {
-        taskCategories: {
-          $elemMatch: {
-            _id: req.body.category,
-          },
-        },
-      },
-    ],
-  }).countDocuments()
-  if (!isCategoryExists) throw new ReqError('Category not exists!')
-
-  const taskCategoryData = {
-    user: req.user._id,
-    task: req.params.taskId,
-    category: req.body.category,
-  }
-
-  const isTaskCategoryAlreadyAdded = await TaskCategory.find(
-    taskCategoryData
-  ).countDocuments()
-  if (isTaskCategoryAlreadyAdded) {
-    throw new ReqError('Category already added')
-  }
-
-  const category = await TaskCategory.create(taskCategoryData)
-  res.success({ category })
-}
-
-exports.removeCategory = async (req, res) => {
-  if (!(req.user._id && req.params.taskId && req.params.categoryId)) {
-    throw new ReqError('Invalid input')
-  }
-
-  await TaskCategory.deleteMany({
-    user: req.user._id,
-    task: req.params.taskId,
-    category: req.params.categoryId,
-  })
-  res.success(null, 204)
 }
 
 exports.saveAndSendTask = async (req, res) => {

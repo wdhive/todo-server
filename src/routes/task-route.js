@@ -3,11 +3,13 @@ const router = express.Router()
 const [
   accountController,
   taskController,
+  categoryController,
   participantController,
   taskSearchHandler,
 ] = ReqError.catch(
   require('../controller/account/account-controller'),
   require('../controller/tasks/task-controller'),
+  require('../controller/tasks/category-controller'),
   require('../controller/tasks/participant-controller'),
   require('../controller/tasks/tasks-search-handler')
 )
@@ -27,8 +29,8 @@ router
   .patch(taskController.updateTask, taskController.saveAndSendTask)
   .delete(taskController.deleteTask)
 
-router.post('/:taskId/category', taskController.addCategory)
-router.delete('/:taskId/category/:categoryId', taskController.removeCategory)
+router.post('/:taskId/category', categoryController.addCategory)
+router.delete('/:taskId/category/:categoryId', categoryController.removeCategory)
 
 // Task Participant
 router.use('/:taskId/*', taskController.setTaskFromInactiveUsers)
