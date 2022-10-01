@@ -38,21 +38,23 @@ PATCH /tasks/{task_id}
 | :-------- | :------- | :------- |
 | `title` | `string` | ... |
 | `description` | `string` | ... |
+| `startingDate` | `date` | ... |
+| `endingDate` | `date` | ... |
 
 ## 
 
 ### Complete Task
 
 ```http
-PATCH /tasks/{task_id}
+PATCH /tasks/{task_id}/complete
 ```
 
 ## 
 
-### UnComplete Task
+### Uncomplete Task
 
 ```http
-PATCH /tasks/{task_id}
+PATCH /tasks/{task_id}/uncomplete
 ```
 
 ## 

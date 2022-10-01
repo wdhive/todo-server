@@ -23,7 +23,7 @@ exports.list = data => {
     else if (type === Number) type = 'number'
     else if (type === Boolean) type = 'boolean'
     else if (type === Array) type = 'array'
-    else if (type === Object) type = 'object'
+    else if (type === Date) type = 'date'
 
     const keyMd = `\`${key}\`${required ? '*' : ''}`.replaceAll('|', '\\|')
     const typeMd = `\`${type || 'unknown'}\``.replaceAll('|', '\\|')

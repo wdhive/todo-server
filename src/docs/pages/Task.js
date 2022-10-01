@@ -16,6 +16,8 @@ exports.content = [
     body: {
       title: String,
       description: String,
+      startingDate: Date,
+      endingDate: Date,
     },
   }),
 
