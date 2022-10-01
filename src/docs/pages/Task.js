@@ -16,9 +16,11 @@ exports.content = [
     body: {
       title: String,
       description: String,
-      completed: Boolean,
     },
   }),
+
+  div('Complete Task', 'patch', '/tasks/{task_id}/complete'),
+  div('Uncomplete Task', 'patch', '/tasks/{task_id}/uncomplete'),
 
   div('Add Category', 'post', '/tasks/{task_id}/category', {
     body: {

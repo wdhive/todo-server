@@ -60,15 +60,7 @@ const taskSchema = mongoose.Schema(
   { versionKey: false }
 )
 
-taskSchema.pre('save', function (next) {
-  if (!this.completed) {
-    this.completedBy = undefined
-    return next()
-  }
-
-  if (this.completed && this.completedBy) next()
-  throw new ReqError('`completedBy` field is missing')
-})
+taskSchema.index({ owner: 1 })
 
 taskSchema.post('remove', function () {
   Promise.all([TaskCategory.deleteMany({ user: this._id })]).catch(() => {})

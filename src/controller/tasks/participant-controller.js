@@ -20,7 +20,9 @@ exports.inviteUser = async (req, res, next) => {
   if (participant) throw new ReqError('Invitation already sent')
 
   req.task.participants.push(userBody)
-  next()
+  const retVal = next()
+  console.log(retVal)
+  console.log(retVal instanceof Promise)
 }
 
 exports.removeUser = async (req, res, next) => {

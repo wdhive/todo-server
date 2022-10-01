@@ -29,10 +29,27 @@ router
   .patch(taskController.updateTask, taskController.saveAndSendTask)
   .delete(taskController.deleteTask)
 
-router.post('/:taskId/category', categoryController.addCategory)
-router.delete('/:taskId/category/:categoryId', categoryController.removeCategory)
+router.patch(
+  '/:taskId/complete',
+  taskController.setTaskFromActiveUsers,
+  taskController.completeTask,
+  taskController.saveAndSendTask
+)
 
-// Task Participant
+router.patch(
+  '/:taskId/uncomplete',
+  taskController.setTaskFromActiveUsers,
+  taskController.unCompleteTask,
+  taskController.saveAndSendTask
+)
+
+router.post('/:taskId/category', categoryController.addCategory)
+router.delete(
+  '/:taskId/category/:categoryId',
+  categoryController.removeCategory
+)
+
+// Task Participant CRUD
 router.use('/:taskId/*', taskController.setTaskFromInactiveUsers)
 router.post(
   '/:taskId/invitation-accept',

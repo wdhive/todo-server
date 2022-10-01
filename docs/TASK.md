@@ -38,7 +38,22 @@ PATCH /tasks/{task_id}
 | :-------- | :------- | :------- |
 | `title` | `string` | ... |
 | `description` | `string` | ... |
-| `completed` | `boolean` | ... |
+
+## 
+
+### Complete Task
+
+```http
+PATCH /tasks/{task_id}
+```
+
+## 
+
+### UnComplete Task
+
+```http
+PATCH /tasks/{task_id}
+```
 
 ## 
 

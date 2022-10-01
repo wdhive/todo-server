@@ -6,6 +6,7 @@ const {
   getUsersAllTaskFilter,
   sanitizeParticipant,
 } = require('./utils')
+const socketStore = require('../../socket/socket-store')
 
 exports.setTaskFromActiveUsers = taskFactory.setTaskParticipants(true)
 exports.setTaskFromInactiveUsers = taskFactory.setTaskParticipants(false)
@@ -14,6 +15,22 @@ exports.onlyForOwner = (req, res, next) => {
     throw new ReqError('You need to be the owner to remove a user')
   }
   next()
+}
+
+exports.onlyForAssigner = (req, res, next) => {
+  if (!req.task.isAssigner(req.user._id)) {
+    throw new ReqError('You need to be an assigner to do this operation')
+  }
+  next()
+}
+
+exports.saveAndSendTask = async (req, res) => {
+  const savedTask = await req.task.save()
+  const task = await savedTask.populate(populateParticipants)
+
+  socketStore.send(req, socketStore.events.task.update, res.success({ task }), {
+    rooms: task.getAllParticipants(),
+  })
 }
 
 exports.getAllTask = async (req, res) => {
@@ -42,19 +59,24 @@ exports.createTask = async (req, res, next) => {
 }
 
 exports.updateTask = async (req, res, next) => {
-  let taskBody = req.getBody(
-    'title description startingDate endingDate completed'
-  )
-
+  let taskBody = req.getBody('title description startingDate endingDate')
   if (!req.task.isModerator(req.user)) {
-    if (req.task.isAssigner(req.user)) {
-      taskBody = req.getBody('completed')
-    } else {
-      throw new ReqError('You do not have permission to update this task')
-    }
+    throw new ReqError('You do not have permission to update this task')
   }
 
   req.task.set(taskBody)
+  next()
+}
+
+exports.completeTask = async (req, res, next) => {
+  req.task.completed = true
+  req.task.completedBy = req.user._id
+  next()
+}
+
+exports.unCompleteTask = async (req, res, next) => {
+  req.task.completed = false
+  req.task.completedBy = undefined
   next()
 }
 
@@ -65,10 +87,4 @@ exports.deleteTask = async (req, res) => {
   await req.task.delete()
 
   res.success({ taskId: req.task._id }, 204)
-}
-
-exports.saveAndSendTask = async (req, res) => {
-  const savedTask = await req.task.save()
-  const task = await savedTask.populate(populateParticipants)
-  res.success({ task })
 }

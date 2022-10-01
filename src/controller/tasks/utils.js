@@ -10,7 +10,7 @@ exports.populateParticipants = [
     },
   },
   {
-    path: 'owner',
+    path: 'owner completedBy',
     select: USER_PUBLIC_INFO,
   },
 ]

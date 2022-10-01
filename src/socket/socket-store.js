@@ -46,7 +46,7 @@ class SocketStore {
     })
   }
 
-  send(roomOrReq, event, data, options = { rooms: [], exclude: '' }) {
+  async send(roomOrReq, event, data, options = { rooms: [], exclude: '' }) {
     if (!(event && data)) {
       throw new DevError(
         "Must need 'room' & 'event' & 'data' to send data by socket"
@@ -57,7 +57,6 @@ class SocketStore {
       roomOrReq,
       options
     )
-
     this.#send(rooms, event, data, excludeSocket)
   }
 
