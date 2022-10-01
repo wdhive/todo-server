@@ -1,4 +1,4 @@
-const socketStore = require('../../socket/socket-store')
+const socketStore = require('../socket-store')
 const errorMessages = require('../../utils/error-messages')
 const { sendJWT } = require('../account/utils')
 

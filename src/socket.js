@@ -1,6 +1,6 @@
 const { Server } = require('socket.io')
 const TaskSocketClient = require('./controller/socket-client')
-const socketStore = require('./socket/socket-store')
+const socketStore = require('./controller/socket-store')
 
 const io = new Server({
   cors: {

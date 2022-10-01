@@ -6,7 +6,7 @@ const {
   getUsersAllTaskFilter,
   sanitizeParticipant,
 } = require('./utils')
-const socketStore = require('../../socket/socket-store')
+const socketStore = require('../socket-store')
 
 exports.setTaskFromActiveUsers = taskFactory.setTaskParticipants(true)
 exports.setTaskFromInactiveUsers = taskFactory.setTaskParticipants(false)

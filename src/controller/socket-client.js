@@ -1,4 +1,4 @@
-const socketStore = require('../socket/socket-store')
+const socketStore = require('../controller/socket-store')
 const jwtToken = require('../utils/jwt-token')
 
 module.exports = class TaskSocketClient {
