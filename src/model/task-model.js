@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const Notification = require('./notification-model')
 const TaskCategory = require('./task-category-model')
 
 const participantSchema = mongoose.Schema(
@@ -63,14 +64,32 @@ const taskSchema = mongoose.Schema(
 taskSchema.index({ owner: 1 })
 
 taskSchema.post('remove', function () {
-  Promise.all([TaskCategory.deleteMany({ user: this._id })]).catch(() => {})
+  Promise.all([
+    TaskCategory.deleteMany({ task: this._id }),
+    Notification.deleteMany({ task: this._id }),
+  ]).catch(() => {})
 })
 
-taskSchema.methods.getAllParticipants = function () {
-  const participants = this.participants.map(({ user }) => user.toString())
-  const mixedArray = [this.owner.toString(), participants].flat()
-  return Array.from(new Set(mixedArray))
-}
+const getParticipantsFactory = isActive =>
+  function () {
+    const filteredParticipants = this.participants.filter(
+      user => user.active === isActive
+    )
+
+    const participants = filteredParticipants.map(
+      user => user.user?._id?.toString() || user.user?.toString()
+    )
+
+    const mixedArray = [
+      this.owner?._id?.toString() || this.owner?.toString(),
+      participants,
+    ].flat()
+
+    return Array.from(new Set(mixedArray))
+  }
+
+taskSchema.methods.getActiveParticipants = getParticipantsFactory(true)
+taskSchema.methods.getInactiveParticipants = getParticipantsFactory(false)
 
 const hasPermission = roles => {
   return function (user) {

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>WebSocket</title>
+    <script src="https://cdn.socket.io/4.4.1/socket.io.min.js"></script>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Rubik&display=swap');
+      html {
+        font-family: 'Rubik';
+        font-size: 18px;
+        line-height: 1.6;
+        padding: 15px 20px;
+        background: #202124;
+        color: rgb(225, 238, 238);
+      }
+    </style>
+  </head>
+  <body></body>
+
+  <script>
+    const write = (text, red = false) => {
+      const element = document.createElement('div')
+      element.style.color = red ? 'salmon' : 'palegreen'
+      element.innerHTML =
+        typeof text === 'string' ? text : JSON.stringify(text, null, 2)
+      document.body.append(element)
+    }
+
+    let socket = io(`http://localhost:8000/v1/tasks-socket`, {
+      auth: {
+        token:
+          'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYzMzUyZDRkMTk2OWY2MWUwMDU4YWU4MiIsImlhdCI6MTY2NDY2OTU5MywiZXhwIjoxNjcyNDQ1NTkzfQ.NHw9lRweQ7rrY3IitUdKitP3lRUIr3n8ykuwUhb3ReI',
+      },
+      reconnection: true,
+      reconnectionDelay: 500,
+      reconnectionDelayMax: 2500,
+      reconnectionAttempts: Infinity,
+    })
+
+    socket.onAny(console.log)
+    socket.on('connect', () => {
+      write(socket.id)
+    })
+
+    socket.on('disconnect', () => {
+      write('-----------------------', true)
+    })
+  </script>
+</html>

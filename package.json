@@ -3,6 +3,7 @@
   "scripts": {
     "docs": "node docs.js",
     "line": "node line.js",
+    "socket": "live-server socket.html",
     "start": "nodemon . --NODE_ENV=development",
     "debug": "ndb npm start",
     "serve": "node ."

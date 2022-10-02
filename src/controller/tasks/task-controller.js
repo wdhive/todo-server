@@ -5,6 +5,7 @@ const {
   populateParticipants,
   getUsersAllTaskFilter,
   sanitizeParticipant,
+  saveAndGetTask,
 } = require('./utils')
 const socketStore = require('../socket-store')
 
@@ -25,11 +26,11 @@ exports.onlyForAssigner = (req, res, next) => {
 }
 
 exports.saveAndSendTask = async (req, res) => {
-  const savedTask = await req.task.save()
-  const task = await savedTask.populate(populateParticipants)
+  const task = await saveAndGetTask(req.task)
+  const data = res.success({ task })
 
-  socketStore.send(req, socketStore.events.task.update, res.success({ task }), {
-    rooms: task.getAllParticipants(),
+  socketStore.send(req, socketStore.events.task.update, data, {
+    rooms: task.getActiveParticipants(),
   })
 }
 
@@ -86,5 +87,15 @@ exports.deleteTask = async (req, res) => {
   }
   await req.task.delete()
 
-  res.success({ taskId: req.task._id }, 204)
+  socketStore.send(
+    req,
+    socketStore.events.task.delete,
+    res.success({ task: req.task._id }, 204),
+    {
+      rooms: [
+        ...req.task.getActiveParticipants(),
+        ...req.task.getInactiveParticipants(),
+      ],
+    }
+  )
 }

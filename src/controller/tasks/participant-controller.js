@@ -1,3 +1,8 @@
+const Notification = require('../../model/notification-model')
+const socketStore = require('../socket-store')
+const { saveAndGetTask } = require('./utils')
+const coreUtils = require('../../core/utils')
+
 const getParticipant = (req, userId, throwErrorAtNull = true) => {
   const participant = req.task.participants.find(({ user }) => {
     return user.toString() === userId.toString()
@@ -9,7 +14,7 @@ const getParticipant = (req, userId, throwErrorAtNull = true) => {
   return participant
 }
 
-exports.inviteUser = async (req, res, next) => {
+exports.inviteUser = async (req, res) => {
   const userBody = req.getBody('user role')
   if (req.task.isOwner(userBody.user)) {
     throw new ReqError('You can not invite the owner')
@@ -20,15 +25,31 @@ exports.inviteUser = async (req, res, next) => {
   if (participant) throw new ReqError('Invitation already sent')
 
   req.task.participants.push(userBody)
-  const retVal = next()
-  console.log(retVal)
-  console.log(retVal instanceof Promise)
+  const task = await saveAndGetTask(req.task)
+  res.success({ task })
+
+  await Notification.create({
+    user: userBody.user,
+    task: task._id,
+    type: 'task-invite',
+  })
 }
 
 exports.removeUser = async (req, res, next) => {
   const participant = getParticipant(req, req.params.userId)
   participant.remove()
   next()
+
+  await Notification.deleteMany({
+    task: req.task._id,
+    user: req.params.userId,
+  })
+
+  socketStore.send(
+    req.params.userId,
+    socketStore.events.task.participantDelete,
+    coreUtils.getSuccess({ task: req.task._id })
+  )
 }
 
 exports.changeRole = async (req, res, next) => {

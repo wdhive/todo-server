@@ -11,6 +11,7 @@ class SocketStore {
       update: 'task-update',
       delete: 'task-delete',
       invite: 'task-invitation',
+      participantDelete: 'task-participant-delete',
       accept: 'task-invitation-accept',
     },
   }
@@ -46,7 +47,7 @@ class SocketStore {
     })
   }
 
-  async send(roomOrReq, event, data, options = { rooms: [], exclude: '' }) {
+  async send(roomOrReq, event, data, options = {}) {
     if (!(event && data)) {
       throw new DevError(
         "Must need 'room' & 'event' & 'data' to send data by socket"
@@ -130,6 +131,7 @@ class SocketStore {
   #idToRoomStringElement(id) {
     if (id instanceof mongoose.Types.ObjectId) return id.toString()
     if (typeof id === 'string') return id
+
     throw new DevError('Invalid id input at socket-store')
   }
 }

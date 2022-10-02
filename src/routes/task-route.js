@@ -58,11 +58,7 @@ router.post(
 )
 
 router.use(taskController.onlyForOwner)
-router.post(
-  '/:taskId/participants',
-  participantController.inviteUser,
-  taskController.saveAndSendTask
-)
+router.post('/:taskId/participants', participantController.inviteUser)
 router
   .route('/:taskId/participants/:userId')
   .delete(participantController.removeUser, taskController.saveAndSendTask)

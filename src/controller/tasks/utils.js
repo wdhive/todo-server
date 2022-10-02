@@ -64,3 +64,8 @@ exports.sanitizeParticipant = async taskBody => {
 
   return okList
 }
+
+exports.saveAndGetTask = async task => {
+  const savedTask = await task.save()
+  return savedTask.populate(this.populateParticipants)
+}
