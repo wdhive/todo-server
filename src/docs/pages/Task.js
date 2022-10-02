@@ -21,6 +21,8 @@ exports.content = [
     },
   }),
 
+  div('Delete Task', 'delete', '/tasks/{task_id}'),
+
   div('Complete Task', 'patch', '/tasks/{task_id}/complete'),
   div('Uncomplete Task', 'patch', '/tasks/{task_id}/uncomplete'),
 
