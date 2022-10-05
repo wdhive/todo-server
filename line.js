@@ -8,6 +8,8 @@ const runCommand = command => {
   })
 }
 
+let fileCount = 0
+
 ;(async () => {
   const gitFiles = await runCommand('git ls-files')
 
@@ -17,6 +19,7 @@ const runCommand = command => {
 
   const fileLineCount = files.map(file => {
     if (!file || file === 'yarn.lock') return 0
+    fileCount++
     const filePath = __dirname + '/' + file
     const fileData = fs.readFileSync(filePath, 'utf-8')
     return fileData.split('\n').length
@@ -26,5 +29,5 @@ const runCommand = command => {
     return acc + current
   }, 0)
 
-  console.log('Found total', lineCount, 'lines of code.')
+  console.log('Total', lineCount, 'lines of code in', fileCount, 'files.')
 })()
