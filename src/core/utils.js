@@ -50,7 +50,7 @@ exports.notFound = (req, res) => {
   res.status(code).json(getFail("Oops, looks like you're lost in space!", code))
 }
 
-exports.ping = (req, res) => res.end()
+exports.ping = (req, res) => res.status(200).json({ message: 'Hello, world!' })
 exports.reqBody = (req, res, next) => {
   if (req.body == null) req.body = {}
   next()
