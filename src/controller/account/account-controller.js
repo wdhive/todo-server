@@ -105,8 +105,8 @@ exports.login = async (req, res) => {
 }
 
 exports.resetPassword = async (req, res) => {
-  const { login, code, new_password } = req.body
-  const user = await User.findOne(getFindUserQuery(login))
+  const { email, code, new_password } = req.body
+  const user = await User.findOne({ email })
 
   if (!user) throw new ReqError(errorMessages.user.notFound)
   const otpRequest = await checkOtpRequest(ForgetPass, { _id: user._id }, code)
