@@ -18,7 +18,7 @@ exports.content = [
       email$: String,
       username$: String,
       name$: String,
-      image: String,
+      avatar: String,
       password$: String,
       code$: String,
     },

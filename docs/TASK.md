@@ -43,6 +43,14 @@ PATCH /tasks/{task_id}
 
 ## 
 
+### Delete Task
+
+```http
+DELETE /tasks/{task_id}
+```
+
+## 
+
 ### Complete Task
 
 ```http

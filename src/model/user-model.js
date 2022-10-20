@@ -25,7 +25,7 @@ const userSchema = mongoose.Schema(
       match: [/^[a-z0-9]+$/, 'Enter a valid username.'],
     },
     email: commonSchemaField.email,
-    image: {
+    avatar: {
       type: String,
       match: [/^https:\/\//, 'Please enter a valid image url'],
     },

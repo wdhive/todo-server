@@ -11,7 +11,7 @@ exports.content = [
   div('Update User', 'patch', '/user', {
     body: {
       name: String,
-      image: String,
+      avatar: String,
     },
   }),
 

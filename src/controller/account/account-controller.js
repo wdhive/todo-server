@@ -84,7 +84,7 @@ exports.sendOtpMail = async (req, res) => {
 }
 
 exports.signup = async (req, res) => {
-  const reqBody = req.getBody('name email username image password')
+  const reqBody = req.getBody('name email username avatar password')
   const user = await User.create(reqBody)
   await UserSettings.create({
     _id: user._id,

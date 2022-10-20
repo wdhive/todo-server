@@ -27,7 +27,7 @@ PATCH /user
 |Body|Type|Description|
 | :-------- | :------- | :------- |
 | `name` | `string` | ... |
-| `image` | `string` | ... |
+| `avatar` | `string` | ... |
 
 ## 
 

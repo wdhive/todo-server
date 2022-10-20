@@ -9,7 +9,7 @@ exports.getUser = async (req, res) => {
 }
 
 exports.updateUser = async (req, res) => {
-  const body = req.getBody('name image')
+  const body = req.getBody('name avatar')
 
   for (let key in body) {
     const value = body[key]
