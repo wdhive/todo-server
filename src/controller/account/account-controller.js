@@ -32,10 +32,10 @@ exports.verifyEmailMail = async (req, res, next) => {
 }
 
 exports.forgetPasswordMail = async (req, res, next) => {
-  const { login } = req.body
-  const user = await User.findOne(getFindUserQuery(login)).select('email')
+  const { email } = req.body
+  const user = await User.findOne({ email }).select('email')
   res.success({
-    email: user.email,
+    email,
     message: `Email sent to your email. (if the any user exists)`,
   })
 
