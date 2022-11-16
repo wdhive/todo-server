@@ -6,7 +6,7 @@
     "socket": "live-server socket.html",
     "dev": "nodemon . --NODE_ENV=development",
     "debug": "ndb npm start",
-    "serve": "node ."
+    "start": "node ."
   },
   "engines": {
     "node": ">=16.0.0"
