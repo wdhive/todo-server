@@ -9,7 +9,7 @@ This page covers everything related to user
 ### Get a new token
 
 ```http
-GET /account/new-token
+GET /user/new-token
 ```
 
 ## 
