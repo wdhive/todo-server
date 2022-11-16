@@ -9,6 +9,7 @@ const socketStore = require('../controller/socket-store')
 const commonSchemaField = require('./common-schema-field')
 const { USER_SAFE_INFO } = require('../config/config')
 const { getFeildsFromObject } = require('../utils')
+const file = require('../file')
 
 const userSchema = mongoose.Schema(
   {
@@ -66,6 +67,7 @@ userSchema.post('remove', function () {
     Task.deleteMany({ owner: this._id }),
     TaskCategory.deleteMany({ user: this._id }),
     UserSettings.deleteOne({ _id: this._id }),
+    file.remove(this.avatar),
   ]).catch(() => {})
 
   socketStore.disconnect(this._id, {

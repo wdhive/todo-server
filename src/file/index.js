@@ -39,9 +39,13 @@ const save = async ({ originalname, path: oldPath }) => {
 }
 
 const remove = async (url) => {
+  if (!url) return
   const publicId = url.match(/(avatar\/\w*)(\.\w*)$/)[1]
   await destroy(publicId)
 }
+
+exports.save = save
+exports.remove = remove
 
 exports.updateFile = async ({ file }, user) => {
   if (!file) return
