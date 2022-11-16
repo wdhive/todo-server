@@ -2,7 +2,7 @@ exports.title = 'User'
 exports.description = 'This page covers everything related to user'
 
 exports.content = [
-  div('Get a new token', 'get', '/account/new-token'),
+  div('Get a new token', 'get', '/user/new-token'),
 
   ,
   div('Get User', 'get', '/user', {
