@@ -7,7 +7,7 @@ const sendMail = require('../../mail/send-mail')
 const errorMessages = require('../../utils/error-messages')
 const accountFactory = require('./account-factory')
 const jwtToken = require('../../utils/jwt-token')
-const { sendJWT, getFindUserQuery, checkOtpRequest } = require('./utils')
+const { getFindUserQuery, checkOtpRequest } = require('./utils')
 
 exports.checkAuth = async (req, res, next) => {
   const user = await jwtToken.verifyUser(req.headers.authorization)
@@ -54,6 +54,7 @@ exports.verifyEmailOtp = async (req, res, next) => {
     },
     code
   )
+
   next()
 }
 
@@ -83,17 +84,18 @@ exports.sendOtpMail = async (req, res) => {
   await sendMail.verifyEmailCode(email, code)
 }
 
-exports.signup = async (req, res) => {
+exports.signup = async (req, res, next) => {
   const reqBody = req.getBody('name email username avatar password')
   const user = await User.create(reqBody)
   await UserSettings.create({
     _id: user._id,
   })
 
-  sendJWT(res, user._id)
+  req.user = user
+  next()
 }
 
-exports.login = async (req, res) => {
+exports.login = async (req, res, next) => {
   const { login, password } = req.body
   const user = await User.findOne(getFindUserQuery(login))
 
@@ -101,10 +103,11 @@ exports.login = async (req, res) => {
     throw new ReqError(errorMessages.auth.failed)
   }
 
-  sendJWT(res, user._id)
+  req.user = user
+  next()
 }
 
-exports.resetPassword = async (req, res) => {
+exports.resetPassword = async (req, res, next) => {
   const { email, code, new_password } = req.body
   const user = await User.findOne({ email })
 
@@ -114,7 +117,14 @@ exports.resetPassword = async (req, res) => {
   user.password = new_password
   await user.save()
   await otpRequest.delete()
-  sendJWT(res, user._id)
+
+  req.user = user
+  next()
+}
+
+exports.sendJwt = (req, res) => {
+  const token = jwtToken.generate(req.user._id)
+  res.success({ token })
 }
 
 exports.changeEmail = accountFactory.changeUserInfo('email')

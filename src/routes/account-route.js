@@ -9,18 +9,25 @@ router.post(
   accountController.verifyEmailMail,
   accountController.sendOtpMail
 )
+
 router.post(
   '/signup',
   accountController.verifyEmailOtp,
-  accountController.signup
+  accountController.signup,
+  accountController.sendJwt
 )
-router.post('/login', accountController.login)
+router.post('/login', accountController.login, accountController.sendJwt)
+
 router.post(
   '/password-forget',
   accountController.forgetPasswordMail,
   accountController.sendOtpMail
 )
-router.post('/password-reset', accountController.resetPassword)
+router.post(
+  '/password-reset',
+  accountController.resetPassword,
+  accountController.sendJwt
+)
 
 // Now every request needs to be logged in and put his 'password' into the body
 router.use(

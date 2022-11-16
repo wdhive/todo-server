@@ -8,19 +8,14 @@ const io = new Server({
   },
 })
 
-io.on('connection', socket => socket.disconnect())
-
-const taskIo = io.of('/v1/tasks-socket')
-taskIo.on('connection', async socket => {
+io.on('connection', async (socket) => {
   try {
     const user = await TaskSocketClient.checkAuth(socket)
-    new TaskSocketClient(taskIo, socket, user)
+    new TaskSocketClient(io, socket, user)
   } catch (err) {
-    console.log(err)
     socket.disconnect(err)
   }
 })
 
-socketStore.initGlobalIo(io)
-socketStore.initChatIo(taskIo)
+socketStore.io = io
 module.exports = io

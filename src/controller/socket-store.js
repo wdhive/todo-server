@@ -2,8 +2,7 @@ const mongoose = require('mongoose')
 const DevError = require('../core/dev-error')
 
 class SocketStore {
-  #chatIo
-  #globalIo
+  io
   #store = {}
 
   events = {
@@ -14,13 +13,6 @@ class SocketStore {
       participantDelete: 'task-participant-delete',
       accept: 'task-invitation-accept',
     },
-  }
-
-  initGlobalIo(globalIo) {
-    this.#globalIo = globalIo
-  }
-  initChatIo(chatIo) {
-    this.#chatIo = chatIo
   }
 
   add(client) {
@@ -42,7 +34,7 @@ class SocketStore {
       options
     )
 
-    this.#exceptSocket(rooms, excludeSocket, client => {
+    this.#exceptSocket(rooms, excludeSocket, (client) => {
       client.socket.disconnect(options.cause)
     })
   }
@@ -62,7 +54,7 @@ class SocketStore {
   }
 
   #send(rooms, event, data, excludeSocket) {
-    this.#exceptSocket(rooms, excludeSocket, client => {
+    this.#exceptSocket(rooms, excludeSocket, (client) => {
       client.socket.emit(event, data)
     })
   }
@@ -109,7 +101,7 @@ class SocketStore {
   }
 
   #exceptSocket(rooms, excludeSocket, cb) {
-    rooms.forEach(room => {
+    rooms.forEach((room) => {
       const roomStore = this.#store[room]
       if (!roomStore) return
 
@@ -123,7 +115,7 @@ class SocketStore {
 
   #generateRoomArray(rooms) {
     if (rooms instanceof Array) {
-      return rooms.map(idUnit => this.#idToRoomStringElement(idUnit))
+      return rooms.map((idUnit) => this.#idToRoomStringElement(idUnit))
     }
     return [this.#idToRoomStringElement(rooms)]
   }

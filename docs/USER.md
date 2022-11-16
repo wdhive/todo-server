@@ -6,6 +6,15 @@ This page covers everything related to user
 
 <br/>
 
+### Get a new token
+
+```http
+GET /account/new-token
+```
+
+## 
+## 
+
 ### Get User
 
 ```http
@@ -14,7 +23,7 @@ GET /user
 
 |Query|Type|Description|
 | :-------- | :------- | :------- |
-| `settings` | `string` | ... |
+| `settings` | `string` | Also get the settings |
 
 ## 
 
@@ -43,7 +52,7 @@ DELETE /user
 
 ## 
 
-### Change Thene
+### Change Theme
 
 ```http
 PATCH /user/change-theme

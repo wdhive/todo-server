@@ -2,9 +2,12 @@ exports.title = 'User'
 exports.description = 'This page covers everything related to user'
 
 exports.content = [
+  div('Get a new token', 'get', '/account/new-token'),
+
+  ,
   div('Get User', 'get', '/user', {
     query: {
-      settings: String,
+      settings: [String, 'Also get the settings'],
     },
   }),
 
@@ -21,7 +24,7 @@ exports.content = [
     },
   }),
 
-  div('Change Thene', 'patch', '/user/change-theme', {
+  div('Change Theme', 'patch', '/user/change-theme', {
     body: {
       theme: [String, 'Light/Dark'],
       hue: [Number, 'between 0-360'],

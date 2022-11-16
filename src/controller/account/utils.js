@@ -1,12 +1,6 @@
-const jwtToken = require('../../utils/jwt-token')
 const errorMessages = require('../../utils/error-messages')
 
-exports.sendJWT = (res, userId) => {
-  const token = jwtToken.generate(userId)
-  res.success({ token })
-}
-
-exports.getFindUserQuery = login => {
+exports.getFindUserQuery = (login) => {
   if (typeof login !== 'string') throw new ReqError('Login field is missing')
   return login.includes('@') ? { email: login } : { username: login }
 }

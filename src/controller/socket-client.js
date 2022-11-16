@@ -4,7 +4,6 @@ const jwtToken = require('../utils/jwt-token')
 module.exports = class TaskSocketClient {
   static async checkAuth(socket) {
     const user = await jwtToken.verifyUser(socket?.handshake?.auth?.token)
-
     return user
   }
 

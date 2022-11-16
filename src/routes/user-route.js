@@ -14,38 +14,28 @@ const [
 
 router.use(accountController.checkAuth)
 
+router.get('/new-token', accountController.sendJwt)
+
 router
   .route('/')
   .get(userController.getUser)
   .patch(userController.updateUser)
-  .delete(
-    accountController.checkPassAfterLoggedIn,
-    userController.deleteUser
-  )
+  .delete(accountController.checkPassAfterLoggedIn, userController.deleteUser)
 
 router.get('/search', usersSearchHandler)
 
 router
   .route('/task-category')
-  .post(
-    settingsController.setSettings,
-    settingsController.addTaskCategory
-  )
+  .post(settingsController.setSettings, settingsController.addTaskCategory)
 
 router
   .route('/task-category/:categoryId')
-  .all(
-    settingsController.setSettings,
-    settingsController.setTaskCategory
-  )
+  .all(settingsController.setSettings, settingsController.setTaskCategory)
   .patch(settingsController.updateTaskCategory)
   .delete(settingsController.deleteTaskCategory)
 
 router
   .route('/change-theme')
-  .patch(
-    settingsController.setSettings,
-    settingsController.changeTheme
-  )
+  .patch(settingsController.setSettings, settingsController.changeTheme)
 
 module.exports = router
