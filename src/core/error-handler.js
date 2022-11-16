@@ -2,12 +2,12 @@ const colors = require('colors/safe')
 const errorMessages = require('../utils/error-messages')
 
 const errorHandler = {
-  duplicateError: err => {
+  duplicateError: (err) => {
     return `The given \`${Object.keys(err?.keyValue)}\` already exists`
   },
 
-  validationError: err => {
-    const messages = Object.values(err?.errors)?.map(error => {
+  validationError: (err) => {
+    const messages = Object.values(err?.errors)?.map((error) => {
       if (error.name === 'CastError') {
         return `Invalid input in \`${error.path}\``
       }
@@ -16,16 +16,16 @@ const errorHandler = {
     return messages.length > 1 ? messages : messages[0]
   },
 
-  castError: err => {
+  castError: (err) => {
     return `Invalid input \`${err?.path}\``
   },
 
-  objParamError: err => {
+  objParamError: (err) => {
     return `Invalid input \`${err.message.match(/(?<=got ).*$/gm)[0]}\``
   },
 }
 
-module.exports = err => {
+module.exports = (err) => {
   if (err.isOperational) return [err.message, err.statusCode ?? 400]
 
   if (err.type === 'entity.parse.failed') {
@@ -48,6 +48,9 @@ module.exports = err => {
 
     case 'CastError':
       return [errorHandler.castError(err), 400]
+
+    case 'MulterError':
+      return [err.message, 400]
 
     case 'ValidationError':
       return [errorHandler.validationError(err), 400]

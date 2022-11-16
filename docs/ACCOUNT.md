@@ -29,7 +29,7 @@ POST /account/signup
 | `email`* | `string` | ... |
 | `username`* | `string` | ... |
 | `name`* | `string` | ... |
-| `avatar` | `string` | ... |
+| `avatar` | `String \| File(FormData)` | ... |
 | `password`* | `string` | ... |
 | `code`* | `string` | ... |
 

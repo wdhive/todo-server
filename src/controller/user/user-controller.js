@@ -1,4 +1,5 @@
 const UserSettings = require('../../model/user-settings-model')
+const file = require('../../file')
 
 exports.getUser = async (req, res) => {
   const data = { user: req.user.getSafeInfo() }
@@ -10,13 +11,10 @@ exports.getUser = async (req, res) => {
 
 exports.updateUser = async (req, res) => {
   const body = req.getBody('name avatar')
+  req.user.set(body)
 
-  for (let key in body) {
-    const value = body[key]
-    if (value) {
-      req.user[key] = value
-    }
-  }
+  await req.user.validate()
+  await file.updateFile(req, req.user)
 
   req.user = await req.user.save()
   res.success({ user: req.user.getSafeInfo() })

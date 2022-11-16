@@ -14,7 +14,7 @@ exports.content = [
   div('Update User', 'patch', '/user', {
     body: {
       name: String,
-      avatar: String,
+      avatar: 'String | File(FormData)',
     },
   }),
 

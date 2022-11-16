@@ -4,7 +4,7 @@
     "docs": "node docs.js",
     "line": "node line.js",
     "socket": "live-server socket.html",
-    "dev": "nodemon . --NODE_ENV=development",
+    "dev": "node --watch . --NODE_ENV=development",
     "debug": "ndb npm start",
     "start": "node ."
   },
@@ -12,19 +12,20 @@
     "node": ">=16.0.0"
   },
   "dependencies": {
-    "bcrypt": "^5.0.1",
-    "colors": "latest",
-    "cors": "latest",
-    "dotenv": "latest",
-    "express": "latest",
-    "express-mongo-sanitize": "latest",
-    "express-rate-limit": "latest",
-    "helmet": "latest",
+    "bcrypt": "^5.1.0",
+    "cloudinary": "^1.32.0",
+    "colors": "^1.4.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "express-mongo-sanitize": "^2.2.0",
+    "express-rate-limit": "^6.7.0",
+    "helmet": "^6.0.0",
     "jsonwebtoken": "^8.5.1",
-    "mongoose": "latest",
-    "nodemailer": "^6.7.8",
-    "nodemon": "^2.0.20",
-    "socket.io": "^4.5.2",
-    "xss-clean": "latest"
+    "mongoose": "^6.7.2",
+    "multer": "^1.4.5-lts.1",
+    "nodemailer": "^6.8.0",
+    "socket.io": "^4.5.3",
+    "xss-clean": "^0.1.1"
   }
 }

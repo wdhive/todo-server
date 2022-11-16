@@ -36,7 +36,7 @@ PATCH /user
 |Body|Type|Description|
 | :-------- | :------- | :------- |
 | `name` | `string` | ... |
-| `avatar` | `string` | ... |
+| `avatar` | `String \| File(FormData)` | ... |
 
 ## 
 

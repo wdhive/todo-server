@@ -1,4 +1,5 @@
 const express = require('express')
+const file = require('../file')
 const router = express.Router()
 const accountController = ReqError.catch(
   require('../controller/account/account-controller')
@@ -12,6 +13,7 @@ router.post(
 
 router.post(
   '/signup',
+  file.fileMiddleware,
   accountController.verifyEmailOtp,
   accountController.signup,
   accountController.sendJwt

@@ -18,7 +18,7 @@ exports.content = [
       email$: String,
       username$: String,
       name$: String,
-      avatar: String,
+      avatar: 'String | File(FormData)',
       password$: String,
       code$: String,
     },

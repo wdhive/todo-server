@@ -8,6 +8,7 @@ const errorMessages = require('../../utils/error-messages')
 const accountFactory = require('./account-factory')
 const jwtToken = require('../../utils/jwt-token')
 const { getFindUserQuery, checkOtpRequest } = require('./utils')
+const file = require('../../file')
 
 exports.checkAuth = async (req, res, next) => {
   const user = await jwtToken.verifyUser(req.headers.authorization)
@@ -85,8 +86,13 @@ exports.sendOtpMail = async (req, res) => {
 }
 
 exports.signup = async (req, res, next) => {
-  const reqBody = req.getBody('name email username avatar password')
-  const user = await User.create(reqBody)
+  const reqBody = req.getBody('name email avatar username password')
+  const user = new User(reqBody)
+
+  await user.validate()
+  await file.updateFile(req, user)
+
+  await user.save()
   await UserSettings.create({
     _id: user._id,
   })

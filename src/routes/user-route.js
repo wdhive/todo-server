@@ -1,5 +1,7 @@
 const express = require('express')
+const file = require('../file')
 const router = express.Router()
+
 const [
   accountController,
   userController,
@@ -19,7 +21,7 @@ router.get('/new-token', accountController.sendJwt)
 router
   .route('/')
   .get(userController.getUser)
-  .patch(userController.updateUser)
+  .patch(file.fileMiddleware, userController.updateUser)
   .delete(accountController.checkPassAfterLoggedIn, userController.deleteUser)
 
 router.get('/search', usersSearchHandler)
