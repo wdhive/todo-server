@@ -22,8 +22,12 @@ exports.decode = (token) => {
 }
 
 exports.verifyUser = async (rawToken) => {
-  if (!rawToken.startsWith('Bearer ')) rawToken = null
-  else rawToken = rawToken.replace(/^Bearer /, '')
+  rawToken = rawToken.toString()
+  if (rawToken.startsWith('Bearer ')) {
+    rawToken = rawToken.replace(/^Bearer /, '')
+  } else {
+    rawToken = null
+  }
 
   const token = this.verify(rawToken)
   const user = await User.findById(token.id)
