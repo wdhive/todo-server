@@ -16,12 +16,12 @@ const errorMessages = {
   },
   user: {
     notFound: ['User could not be found', 404],
-    deleted: ['User no longer exixts', 404],
+    deleted: ['User no longer exixts', 401], // This will logout if logged in
   },
   auth: {
-    jwtExpire: ['Your token is no longer valid', 400],
-    failed: ['Login credentials are incorrect', 400],
-    invalid: ['Login credentials are invalid', 400],
+    jwtExpire: ['Your token is no longer valid', 401], // This will logout if logged in
+    failed: ['Login credentials are incorrect', 401], // This will logout if logged in
+    invalid: ['Login credentials are invalid', 401], // This will logout if logged in
   },
   otp: {
     notExists: ['User never requested for OTP', 400],
