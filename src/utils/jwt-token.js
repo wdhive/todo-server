@@ -22,11 +22,10 @@ exports.decode = (token) => {
 }
 
 exports.verifyUser = async (rawToken) => {
-  rawToken = rawToken.toString()
-  if (rawToken.startsWith('Bearer ')) {
+  if (rawToken?.startsWith('Bearer ')) {
     rawToken = rawToken.replace(/^Bearer /, '')
   } else {
-    rawToken = null
+    rawToken = 'none'
   }
 
   const token = this.verify(rawToken)
