@@ -67,26 +67,6 @@ PATCH /tasks/{task_id}/uncomplete
 
 ## 
 
-### Add Collection
-
-```http
-POST /tasks/{task_id}/collection
-```
-
-|Body|Type|Description|
-| :-------- | :------- | :------- |
-| `collection`* | `string` | Collection ID |
-
-## 
-
-### Delete Collection
-
-```http
-DELETE /tasks/{task_id}/collection/{collection_id}
-```
-
-## 
-
 ### Invite Participants
 
 ```http

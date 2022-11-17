@@ -1,4 +1,5 @@
 const Task = require('../../model/task-model')
+const TaskCollection = require('../../model/task-collection-model')
 const { USER_PUBLIC_INFO } = require('../../config/config')
 const { usersExists } = require('../user/utils')
 
@@ -67,9 +68,24 @@ exports.sanitizeParticipant = async (taskBody) => {
   return okList
 }
 
-exports.saveAndGetTask = async (task) => {
-  const savedTask = await task.save()
-  return savedTask.populate(this.populateParticipants)
+exports.saveAndGetTask = async (req) => {
+  const savedTask = await req.task.save()
+  const populated = await savedTask.populate(this.populateParticipants)
+
+  let collectionId = req.task_collection?.collectionId
+  if (!collectionId) {
+    const collection = await TaskCollection.exists({
+      user: req.user._id,
+      task: req.task._id,
+    })
+      .lean()
+      .select('collectionId')
+
+    collectionId = collection?.collectionId
+  }
+
+  populated._doc.collection = collectionId
+  return populated
 }
 
 exports.isTaskExists = async (taskId, userId) => {

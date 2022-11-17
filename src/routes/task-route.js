@@ -3,15 +3,15 @@ const router = express.Router()
 const [
   accountController,
   taskController,
-  collectionController,
   participantController,
   taskSearchHandler,
+  collectionController,
 ] = ReqError.catch(
   require('../controller/account/account-controller'),
   require('../controller/tasks/task-controller'),
-  require('../controller/tasks/collection-controller'),
   require('../controller/tasks/participant-controller'),
-  require('../controller/tasks/tasks-search-handler')
+  require('../controller/tasks/tasks-search-handler'),
+  require('../controller/tasks/collection-controller')
 )
 
 router.use(accountController.checkAuth)
@@ -21,13 +21,21 @@ router.get('/search', taskSearchHandler)
 router
   .route('/')
   .get(taskController.getAllTask)
-  .post(taskController.createTask, taskController.saveAndSendTask)
+  .post(
+    taskController.createTask,
+    collectionController.updateTaskCollection,
+    taskController.saveAndSendTask
+  )
 
 router
   .route('/:taskId')
   .all(taskController.setTaskFromActiveUsers)
-  .patch(taskController.updateTask, taskController.saveAndSendTask)
   .delete(taskController.deleteTask)
+  .patch(
+    taskController.updateTask,
+    collectionController.updateTaskCollection,
+    taskController.saveAndSendTask
+  )
 
 router.patch(
   '/:taskId/complete',
@@ -41,20 +49,6 @@ router.patch(
   taskController.setTaskFromActiveUsers,
   taskController.unCompleteTask,
   taskController.saveAndSendTask
-)
-
-router.post(
-  '/:taskId/collection',
-  taskController.isTaskExistsFromActiveUsers,
-  collectionController.isCollectionExists_body,
-  collectionController.addCollection
-)
-
-router.delete(
-  '/:taskId/collection/:collection',
-  taskController.isTaskExistsFromActiveUsers,
-  collectionController.isCollectionExists_params,
-  collectionController.removeCollection
 )
 
 // Task Participant CRUD

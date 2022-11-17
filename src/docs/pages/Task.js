@@ -26,18 +26,6 @@ exports.content = [
   div('Complete Task', 'patch', '/tasks/{task_id}/complete'),
   div('Uncomplete Task', 'patch', '/tasks/{task_id}/uncomplete'),
 
-  div('Add Collection', 'post', '/tasks/{task_id}/collection', {
-    body: {
-      collection$: [String, 'Collection ID'],
-    },
-  }),
-
-  div(
-    'Delete Collection',
-    'delete',
-    '/tasks/{task_id}/collection/{collection_id}'
-  ),
-
   div('Invite Participants', 'post', '/tasks/{task_id}/participants', {
     body: {
       user$: [String, 'Participant Id'],

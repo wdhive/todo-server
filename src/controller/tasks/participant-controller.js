@@ -25,7 +25,7 @@ exports.inviteUser = async (req, res) => {
   if (participant) throw new ReqError('Invitation already sent')
 
   req.task.participants.push(userBody)
-  const task = await saveAndGetTask(req.task)
+  const task = await saveAndGetTask(req)
   res.success({ task })
 
   await Notification.create({

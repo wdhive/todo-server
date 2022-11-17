@@ -29,7 +29,7 @@ module.exports = (title, method, endPoint, main = {}, note) => {
 
   const endPointWithOrigin = endPoint.replace(
     '{{URL}}',
-    'https://young-coders-todo-app.herokuapp.com/v1/'
+    'https://baby-todo.onrender.com/'
   )
 
   const markup = block.section(

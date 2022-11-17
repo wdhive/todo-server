@@ -9,7 +9,6 @@ const {
   isTaskExists,
 } = require('./utils')
 const socketStore = require('../socket-store')
-const errorMessages = require('../../utils/error-messages')
 
 exports.setTaskFromActiveUsers = taskFactory.setTaskParticipants({
   active: true,
@@ -40,7 +39,7 @@ exports.onlyForAssigner = (req, res, next) => {
 }
 
 exports.saveAndSendTask = async (req, res) => {
-  const task = await saveAndGetTask(req.task)
+  const task = await saveAndGetTask(req)
   const data = res.success({ task })
 
   socketStore.send(req, socketStore.events.task.update, data, {
@@ -50,16 +49,26 @@ exports.saveAndSendTask = async (req, res) => {
 
 exports.getAllTask = async (req, res) => {
   const queryScript = getUsersAllTaskFilter(req.user._id)
-  const tasks = await Task.find(queryScript).populate(populateParticipants)
-  const totalTasks = await Task.find(queryScript).countDocuments()
 
-  const taskIds = tasks.map((task) => task._id)
-  const collections = await TaskCollection.find({
+  const totalTasks = await Task.find(queryScript).countDocuments()
+  const tasks = await Task.find(queryScript)
+    .lean()
+    .populate(populateParticipants)
+
+  const collectionsArray = await TaskCollection.find({
     user: req.user._id,
-    task: taskIds,
+    task: tasks.map((task) => task._id),
+  }).lean()
+  const collectionsIds = {}
+  collectionsArray.forEach(({ task, collectionId }) => {
+    collectionsIds[task] = collectionId
   })
 
-  res.success({ totalTasks, tasks, collections })
+  tasks.forEach((task) => {
+    task.collection = collectionsIds[task._id]
+  })
+
+  res.success({ totalTasks, tasks })
 }
 
 exports.createTask = async (req, res, next) => {

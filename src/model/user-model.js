@@ -28,7 +28,7 @@ const userSchema = mongoose.Schema(
     email: commonSchemaField.email,
     avatar: {
       type: String,
-      match: [/^https:\/\//, 'Please enter a valid image url'],
+      match: [/^https?:\/\//, 'Please enter a valid image url'],
     },
     password: {
       type: String,

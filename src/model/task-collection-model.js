@@ -7,11 +7,11 @@ const taskCollectionSchema = mongoose.Schema(
       required: true,
       select: false,
     },
-    collectionId: {
+    task: {
       type: mongoose.Types.ObjectId,
       required: true,
     },
-    task: {
+    collectionId: {
       type: mongoose.Types.ObjectId,
       required: true,
     },
