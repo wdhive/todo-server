@@ -28,7 +28,7 @@ exports.content = [
 
   div('Add Collection', 'post', '/tasks/{task_id}/collection', {
     body: {
-      Collection$: [String, 'Collection ID'],
+      collection$: [String, 'Collection ID'],
     },
   }),
 

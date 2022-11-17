@@ -75,7 +75,7 @@ POST /tasks/{task_id}/collection
 
 |Body|Type|Description|
 | :-------- | :------- | :------- |
-| `Collection`* | `string` | Collection ID |
+| `collection`* | `string` | Collection ID |
 
 ## 
 

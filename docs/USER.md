@@ -68,7 +68,7 @@ PATCH /user/change-theme
 ### Add Task Collection
 
 ```http
-POST /user/collection
+POST /user/collections
 ```
 
 |Body|Type|Description|
@@ -81,7 +81,7 @@ POST /user/collection
 ### Update Task Collection
 
 ```http
-PATCH /user/collection/{collectionId}
+PATCH /user/collections/{collectionId}
 ```
 
 |Body|Type|Description|
@@ -94,6 +94,6 @@ PATCH /user/collection/{collectionId}
 ### Delete Task Collection
 
 ```http
-DELETE /user/collection/{collectionId}
+DELETE /user/collections/{collectionId}
 ```
 
