@@ -67,22 +67,22 @@ PATCH /tasks/{task_id}/uncomplete
 
 ## 
 
-### Add Category
+### Add Collection
 
 ```http
-POST /tasks/{task_id}/category
+POST /tasks/{task_id}/collection
 ```
 
 |Body|Type|Description|
 | :-------- | :------- | :------- |
-| `category`* | `string` | Category ID |
+| `Collection`* | `string` | Collection ID |
 
 ## 
 
-### Delete Category
+### Delete Collection
 
 ```http
-DELETE /tasks/{task_id}/category/{category_id}
+DELETE /tasks/{task_id}/collection/{collection_id}
 ```
 
 ## 

@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 const Notification = require('./notification-model')
-const TaskCategory = require('./task-category-model')
+const TaskCollection = require('./task-collection-model')
 
 const participantSchema = mongoose.Schema(
   {
@@ -65,7 +65,7 @@ taskSchema.index({ owner: 1 })
 
 taskSchema.post('remove', function () {
   Promise.all([
-    TaskCategory.deleteMany({ task: this._id }),
+    TaskCollection.deleteMany({ task: this._id }),
     Notification.deleteMany({ task: this._id }),
   ]).catch(() => {})
 })

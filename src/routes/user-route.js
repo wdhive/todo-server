@@ -27,14 +27,14 @@ router
 router.get('/search', usersSearchHandler)
 
 router
-  .route('/task-category')
-  .post(settingsController.setSettings, settingsController.addTaskCategory)
+  .route('/collections')
+  .post(settingsController.setSettings, settingsController.createTaskCollection)
 
 router
-  .route('/task-category/:categoryId')
-  .all(settingsController.setSettings, settingsController.setTaskCategory)
-  .patch(settingsController.updateTaskCategory)
-  .delete(settingsController.deleteTaskCategory)
+  .route('/collections/:collection')
+  .all(settingsController.setSettings, settingsController.setTaskCollection)
+  .patch(settingsController.updateTaskCollection)
+  .delete(settingsController.deleteTaskCollection)
 
 router
   .route('/change-theme')

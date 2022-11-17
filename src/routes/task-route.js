@@ -3,13 +3,13 @@ const router = express.Router()
 const [
   accountController,
   taskController,
-  categoryController,
+  collectionController,
   participantController,
   taskSearchHandler,
 ] = ReqError.catch(
   require('../controller/account/account-controller'),
   require('../controller/tasks/task-controller'),
-  require('../controller/tasks/category-controller'),
+  require('../controller/tasks/collection-controller'),
   require('../controller/tasks/participant-controller'),
   require('../controller/tasks/tasks-search-handler')
 )
@@ -43,10 +43,18 @@ router.patch(
   taskController.saveAndSendTask
 )
 
-router.post('/:taskId/category', categoryController.addCategory)
+router.post(
+  '/:taskId/collection',
+  taskController.isTaskExistsFromActiveUsers,
+  collectionController.isCollectionExists_body,
+  collectionController.addCollection
+)
+
 router.delete(
-  '/:taskId/category/:categoryId',
-  categoryController.removeCategory
+  '/:taskId/collection/:collection',
+  taskController.isTaskExistsFromActiveUsers,
+  collectionController.isCollectionExists_params,
+  collectionController.removeCollection
 )
 
 // Task Participant CRUD

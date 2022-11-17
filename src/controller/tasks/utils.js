@@ -1,3 +1,4 @@
+const Task = require('../../model/task-model')
 const { USER_PUBLIC_INFO } = require('../../config/config')
 const { usersExists } = require('../user/utils')
 
@@ -28,23 +29,24 @@ exports.getUsersAllTaskFilter = (userId, active = true) => {
   }
 }
 
-exports.getUsersTaskFilter = (taskId, userId, active) => {
+const getUsersTaskFilter = (taskId, ...args) => {
   return {
     $and: [
       {
         _id: taskId,
       },
-      this.getUsersAllTaskFilter(userId, active),
+      this.getUsersAllTaskFilter(...args),
     ],
   }
 }
+exports.getUsersTaskFilter = getUsersTaskFilter
 
-exports.sanitizeParticipant = async taskBody => {
+exports.sanitizeParticipant = async (taskBody) => {
   const list = taskBody.participants
   if (!list) return
   const userIds = []
 
-  const okList = list.map(participants => {
+  const okList = list.map((participants) => {
     if (participants.user.toString() === taskBody.owner.toString()) {
       throw new ReqError('You can not invite the owner for a task')
     }
@@ -65,7 +67,12 @@ exports.sanitizeParticipant = async taskBody => {
   return okList
 }
 
-exports.saveAndGetTask = async task => {
+exports.saveAndGetTask = async (task) => {
   const savedTask = await task.save()
   return savedTask.populate(this.populateParticipants)
+}
+
+exports.isTaskExists = async (taskId, userId) => {
+  const filter = getUsersTaskFilter(taskId, userId, true)
+  return Task.exists(filter)
 }

@@ -1,46 +1,50 @@
-const TaskCategory = require('../../model/task-category-model')
+const TaskCollection = require('../../model/task-collection-model')
 const UserSettings = require('../../model/user-settings-model')
 
 exports.setSettings = async (req, res, next) => {
   let settings = await UserSettings.findById(req.user._id)
-  req.userSettings = settings
+  req.user_settings = settings
   next()
 }
 
-exports.setTaskCategory = async (req, res, next) => {
-  const Categories = req.userSettings.taskCategories.id(req.params.categoryId)
-  if (!category) {
-    throw new ReqError('No category found with this id')
+exports.setTaskCollection = async (req, res, next) => {
+  const collection = req.user_settings.collections.id(req.params.collection)
+  if (!collection) {
+    throw new ReqError('No Collection found with this id')
   }
-  req.userSettingsCategories = Categories
+  req.user_collection = collection
   next()
 }
 
-exports.addTaskCategory = async (req, res) => {
-  const category = req.userSettings.taskCategories.create(req.body)
-  req.userSettings.taskCategories.push(category)
-  await req.userSettings.save()
-  res.success({ category })
+exports.createTaskCollection = async (req, res) => {
+  const collection = req.user_settings.collections.create(req.body)
+  req.user_settings.collections.push(collection)
+
+  await req.user_settings.save()
+  res.success({ collection })
 }
 
-exports.updateTaskCategory = async (req, res) => {
-  const categories = req.userSettingsCategories
-  delete req.body._id
-  categories.set(req.body)
-  await req.userSettings.save()
-  res.success({ category: categories })
+exports.updateTaskCollection = async (req, res) => {
+  const reqBody = req.getBody('name hue')
+  const collection = req.user_collection
+  collection.set(reqBody)
+
+  await req.user_settings.save()
+  res.success({ collection })
 }
 
-exports.deleteTaskCategory = async (req, res) => {
-  req.userSettingsCategories.remove()
-  await req.userSettings.save()
-  await TaskCategory.deleteMany({ category: req.params.categoryId })
+exports.deleteTaskCollection = async (req, res) => {
+  req.user_collection.remove()
+  await req.user_settings.save()
+  await TaskCollection.deleteMany({
+    collectionId: req.params.collection,
+  })
   res.success(null, 204)
 }
 
 exports.changeTheme = async (req, res) => {
   const themeBody = req.getBody('theme hue')
-  const newSettings = await req.userSettings.set(themeBody).save()
+  const newSettings = await req.user_settings.set(themeBody).save()
   res.success({
     theme: newSettings.theme,
     hue: newSettings.hue,

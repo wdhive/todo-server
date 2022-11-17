@@ -26,13 +26,17 @@ exports.content = [
   div('Complete Task', 'patch', '/tasks/{task_id}/complete'),
   div('Uncomplete Task', 'patch', '/tasks/{task_id}/uncomplete'),
 
-  div('Add Category', 'post', '/tasks/{task_id}/category', {
+  div('Add Collection', 'post', '/tasks/{task_id}/collection', {
     body: {
-      category$: [String, 'Category ID'],
+      Collection$: [String, 'Collection ID'],
     },
   }),
 
-  div('Delete Category', 'delete', '/tasks/{task_id}/category/{category_id}'),
+  div(
+    'Delete Collection',
+    'delete',
+    '/tasks/{task_id}/collection/{collection_id}'
+  ),
 
   div('Invite Participants', 'post', '/tasks/{task_id}/participants', {
     body: {

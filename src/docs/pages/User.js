@@ -31,19 +31,19 @@ exports.content = [
     },
   }),
 
-  div('Add Task Category', 'post', '/user/task-category', {
+  div('Add Task Collection', 'post', '/user/collection', {
     body: {
       name$: String,
       hue$: [Number, 'between 0-360'],
     },
   }),
 
-  div('Update Task Category', 'patch', '/user/task-category/{category_id}', {
+  div('Update Task Collection', 'patch', '/user/collection/{collectionId}', {
     body: {
       name: String,
       hue: [Number, 'between 0-360'],
     },
   }),
 
-  div('Delete Task Category', 'delete', '/user/task-category/{category_id}'),
+  div('Delete Task Collection', 'delete', '/user/collection/{collectionId}'),
 ]

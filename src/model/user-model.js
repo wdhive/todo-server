@@ -3,7 +3,7 @@ const bcrypt = require('bcrypt')
 const errorMessages = require('../utils/error-messages')
 const VerifyEmail = require('./otp-verify-email-model')
 const Task = require('./task-model')
-const TaskCategory = require('./task-category-model')
+const TaskCollcetion = require('./task-collection-model')
 const UserSettings = require('./user-settings-model')
 const socketStore = require('../controller/socket-store')
 const commonSchemaField = require('./common-schema-field')
@@ -65,7 +65,7 @@ userSchema.post('save', async function () {
 userSchema.post('remove', function () {
   Promise.all([
     Task.deleteMany({ owner: this._id }),
-    TaskCategory.deleteMany({ user: this._id }),
+    TaskCollcetion.deleteMany({ user: this._id }),
     UserSettings.deleteOne({ _id: this._id }),
     file.remove(this.avatar),
   ]).catch(() => {})

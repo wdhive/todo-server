@@ -1,13 +1,13 @@
 const mongoose = require('mongoose')
 
-const taskCategorySchema = mongoose.Schema(
+const taskCollectionSchema = mongoose.Schema(
   {
     user: {
       type: mongoose.Types.ObjectId,
       required: true,
       select: false,
     },
-    category: {
+    collectionId: {
       type: mongoose.Types.ObjectId,
       required: true,
     },
@@ -19,10 +19,9 @@ const taskCategorySchema = mongoose.Schema(
   { versionKey: false }
 )
 
-taskCategorySchema.index(
+taskCollectionSchema.index(
   {
     user: 1,
-    category: 1,
     task: 1,
   },
   {
@@ -30,4 +29,4 @@ taskCategorySchema.index(
   }
 )
 
-module.exports = mongoose.model('task-category', taskCategorySchema)
+module.exports = mongoose.model('task-collection', taskCollectionSchema)

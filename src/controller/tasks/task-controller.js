@@ -1,16 +1,30 @@
 const Task = require('../../model/task-model')
-const TaskCategory = require('../../model/task-category-model')
+const TaskCollection = require('../../model/task-collection-model')
 const taskFactory = require('./task-factory')
 const {
   populateParticipants,
   getUsersAllTaskFilter,
   sanitizeParticipant,
   saveAndGetTask,
+  isTaskExists,
 } = require('./utils')
 const socketStore = require('../socket-store')
+const errorMessages = require('../../utils/error-messages')
 
-exports.setTaskFromActiveUsers = taskFactory.setTaskParticipants(true)
-exports.setTaskFromInactiveUsers = taskFactory.setTaskParticipants(false)
+exports.setTaskFromActiveUsers = taskFactory.setTaskParticipants({
+  active: true,
+})
+exports.setTaskFromInactiveUsers = taskFactory.setTaskParticipants({
+  active: false,
+})
+exports.isTaskExistsFromActiveUsers = async (req, res, next) => {
+  if (await isTaskExists(req.params.taskId, req.user._id)) {
+    return next()
+  }
+
+  throw new ReqError("Task doesn't exists", 404)
+}
+
 exports.onlyForOwner = (req, res, next) => {
   if (!req.task.isOwner(req.user._id)) {
     throw new ReqError('You need to be the owner to remove a user')
@@ -39,13 +53,13 @@ exports.getAllTask = async (req, res) => {
   const tasks = await Task.find(queryScript).populate(populateParticipants)
   const totalTasks = await Task.find(queryScript).countDocuments()
 
-  const taskIds = tasks.map(task => task._id)
-  const taskCategories = await TaskCategory.find({
+  const taskIds = tasks.map((task) => task._id)
+  const collections = await TaskCollection.find({
     user: req.user._id,
     task: taskIds,
   })
 
-  res.success({ totalTasks, tasks, taskCategories })
+  res.success({ totalTasks, tasks, collections })
 }
 
 exports.createTask = async (req, res, next) => {

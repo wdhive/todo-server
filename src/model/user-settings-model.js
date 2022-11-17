@@ -20,7 +20,7 @@ const userSettingsSchema = mongoose.Schema(
       required: false,
     },
 
-    taskCategories: [
+    collections: [
       {
         name: {
           type: String,

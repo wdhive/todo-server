@@ -65,10 +65,10 @@ PATCH /user/change-theme
 
 ## 
 
-### Add Task Category
+### Add Task Collection
 
 ```http
-POST /user/task-category
+POST /user/collection
 ```
 
 |Body|Type|Description|
@@ -78,10 +78,10 @@ POST /user/task-category
 
 ## 
 
-### Update Task Category
+### Update Task Collection
 
 ```http
-PATCH /user/task-category/{category_id}
+PATCH /user/collection/{collectionId}
 ```
 
 |Body|Type|Description|
@@ -91,9 +91,9 @@ PATCH /user/task-category/{category_id}
 
 ## 
 
-### Delete Task Category
+### Delete Task Collection
 
 ```http
-DELETE /user/task-category/{category_id}
+DELETE /user/collection/{collectionId}
 ```
 
