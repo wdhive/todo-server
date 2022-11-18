@@ -75,6 +75,7 @@ exports.createTask = async (req, res, next) => {
   const taskBody = req.getBody(
     'title description startingDate endingDate participants'
   )
+  taskBody.startingDate ||= Date.now()
   taskBody.owner = req.user._id
   taskBody.participants = await sanitizeParticipant(taskBody)
 
