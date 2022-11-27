@@ -40,6 +40,11 @@ const userSchema = mongoose.Schema(
       required: true,
       default: Date.now,
     },
+    createdAt: {
+      type: Date,
+      required: true,
+      default: Date.now,
+    },
   },
   {
     versionKey: false,
