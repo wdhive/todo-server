@@ -14,27 +14,6 @@ const getParticipant = (req, userId, throwErrorAtNull = true) => {
   return participant
 }
 
-exports.inviteUser = async (req, res) => {
-  const userBody = req.getBody('user role')
-  if (req.task.isOwner(userBody.user)) {
-    throw new ReqError('You can not invite the owner')
-  }
-
-  const participant = getParticipant(req, userBody.user, false)
-  if (participant?.active) throw new ReqError('User already been added')
-  if (participant) throw new ReqError('Invitation already sent')
-
-  req.task.participants.push(userBody)
-  const task = await saveAndGetTask(req)
-  res.success({ task })
-
-  await Notification.create({
-    user: userBody.user,
-    task: task._id,
-    type: 'task-invite',
-  })
-}
-
 exports.removeUser = async (req, res, next) => {
   const participant = getParticipant(req, req.params.userId)
   participant.remove()

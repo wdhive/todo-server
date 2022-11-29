@@ -8,6 +8,8 @@ exports.content = [
     body: {
       title$: String,
       description$: String,
+      startingDate: Date,
+      endingDate: Date,
       participants: Array,
     },
   }),
@@ -18,6 +20,7 @@ exports.content = [
       description: String,
       startingDate: Date,
       endingDate: Date,
+      participants: Array,
     },
   }),
 
@@ -25,12 +28,6 @@ exports.content = [
 
   div('Complete Task', 'patch', '/tasks/{task_id}/complete'),
   div('Uncomplete Task', 'patch', '/tasks/{task_id}/uncomplete'),
-
-  div('Invite Participants', 'post', '/tasks/{task_id}/participants', {
-    body: {
-      user$: [String, 'Participant Id'],
-    },
-  }),
 
   div('Remove Participant', 'delete', '/tasks/{task_id}/participants/{user}'),
 

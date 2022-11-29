@@ -24,6 +24,8 @@ POST /tasks
 | :-------- | :------- | :------- |
 | `title`* | `string` | ... |
 | `description`* | `string` | ... |
+| `startingDate` | `date` | ... |
+| `endingDate` | `date` | ... |
 | `participants` | `array` | ... |
 
 ## 
@@ -40,6 +42,7 @@ PATCH /tasks/{task_id}
 | `description` | `string` | ... |
 | `startingDate` | `date` | ... |
 | `endingDate` | `date` | ... |
+| `participants` | `array` | ... |
 
 ## 
 
@@ -64,18 +67,6 @@ PATCH /tasks/{task_id}/complete
 ```http
 PATCH /tasks/{task_id}/uncomplete
 ```
-
-## 
-
-### Invite Participants
-
-```http
-POST /tasks/{task_id}/participants
-```
-
-|Body|Type|Description|
-| :-------- | :------- | :------- |
-| `user`* | `string` | Participant Id |
 
 ## 
 

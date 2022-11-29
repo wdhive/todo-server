@@ -1,5 +1,6 @@
 const Task = require('../../model/task-model')
 const TaskCollection = require('../../model/task-collection-model')
+const Notification = require('../../model/notification-model')
 const taskFactory = require('./task-factory')
 const {
   populateParticipants,
@@ -13,7 +14,7 @@ const socketStore = require('../socket-store')
 exports.setTaskFromActiveUsers = taskFactory.setTaskParticipants({
   active: true,
 })
-exports.setTaskFromInactiveUsers = taskFactory.setTaskParticipants({
+exports.setTaskFromAllUsers = taskFactory.setTaskParticipants({
   active: false,
 })
 exports.isTaskExistsFromActiveUsers = async (req, res, next) => {
@@ -77,9 +78,16 @@ exports.createTask = async (req, res, next) => {
   )
   taskBody.startingDate ||= Date.now()
   taskBody.owner = req.user._id
-  taskBody.participants = await sanitizeParticipant(taskBody)
-
   req.task = new Task(taskBody)
+
+  const participants = req.body.participants
+  if (!participants) return next()
+
+  taskBody.participants = await sanitizeParticipant(
+    participants,
+    req.task.owner
+  )
+
   next()
 }
 
@@ -88,8 +96,35 @@ exports.updateTask = async (req, res, next) => {
   if (!req.task.isModerator(req.user)) {
     throw new ReqError('You do not have permission to update this task')
   }
-
   req.task.set(taskBody)
+
+  const participants = req.body.participants
+  if (!participants || !req.task.isOwner(req.user._id)) return next()
+
+  const alreadyParticipants =
+    req.task.participants?.map(({ user }) => user.toString()) ?? []
+  const validParticipants = await sanitizeParticipant(
+    participants,
+    req.task.owner
+  )
+
+  validParticipants.forEach(({ user }) => {
+    if (alreadyParticipants.includes(user)) {
+      throw new ReqError('User already invited')
+    }
+  })
+
+  req.task.participants.push(...validParticipants)
+  await req.task.validate()
+
+  validParticipants.forEach(({ user }) => {
+    Notification.create({
+      user,
+      task: req.task._id,
+      type: 'task-invite',
+    }).catch(() => {})
+  })
+
   next()
 }
 

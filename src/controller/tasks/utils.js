@@ -42,13 +42,11 @@ const getUsersTaskFilter = (taskId, ...args) => {
 }
 exports.getUsersTaskFilter = getUsersTaskFilter
 
-exports.sanitizeParticipant = async (taskBody) => {
-  const list = taskBody.participants
-  if (!list) return
+exports.sanitizeParticipant = async (list, ownerId) => {
   const userIds = []
 
   const okList = list.map((participants) => {
-    if (participants.user.toString() === taskBody.owner.toString()) {
+    if (participants.user.toString() === ownerId.toString()) {
       throw new ReqError('You can not invite the owner for a task')
     }
 

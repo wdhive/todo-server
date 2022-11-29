@@ -52,7 +52,7 @@ router.patch(
 )
 
 // Task Participant CRUD
-router.use('/:taskId/*', taskController.setTaskFromInactiveUsers)
+router.use(taskController.setTaskFromAllUsers)
 router.post(
   '/:taskId/invitation-accept',
   participantController.acceptUser,
@@ -60,7 +60,6 @@ router.post(
 )
 
 router.use(taskController.onlyForOwner)
-router.post('/:taskId/participants', participantController.inviteUser)
 router
   .route('/:taskId/participants/:userId')
   .delete(participantController.removeUser, taskController.saveAndSendTask)
