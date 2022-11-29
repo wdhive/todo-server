@@ -25,6 +25,11 @@ module.exports = async (req, res) => {
     })
 
   if (exactUser) {
+    const ind = matchedUsers.findIndex(
+      (user) => user._id.toString() === exactUser._id.toString()
+    )
+
+    if (ind >= 0) matchedUsers.splice(ind, 1)
     matchedUsers.unshift(exactUser)
   }
 
