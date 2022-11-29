@@ -2,6 +2,17 @@ const Task = require('../../model/task-model')
 const TaskCollection = require('../../model/task-collection-model')
 const { USER_PUBLIC_INFO } = require('../../config/config')
 const { usersExists } = require('../user/utils')
+const Notification = require('../../model/notification-model')
+
+exports.createInviteNotification = (task, participants) => {
+  participants.forEach(({ user }) => {
+    Notification.create({
+      user,
+      task,
+      type: 'task-invite',
+    }).catch(() => {})
+  })
+}
 
 exports.populateParticipants = [
   {

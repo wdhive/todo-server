@@ -8,6 +8,7 @@ const {
   sanitizeParticipant,
   saveAndGetTask,
   isTaskExists,
+  createInviteNotification,
 } = require('./utils')
 const socketStore = require('../socket-store')
 
@@ -73,9 +74,7 @@ exports.getAllTask = async (req, res) => {
 }
 
 exports.createTask = async (req, res, next) => {
-  const taskBody = req.getBody(
-    'title description startingDate endingDate participants'
-  )
+  const taskBody = req.getBody('title description startingDate endingDate')
   taskBody.startingDate ||= Date.now()
   taskBody.owner = req.user._id
   req.task = new Task(taskBody)
@@ -83,12 +82,14 @@ exports.createTask = async (req, res, next) => {
   const participants = req.body.participants
   if (!participants) return next()
 
-  taskBody.participants = await sanitizeParticipant(
+  req.task.participants = await sanitizeParticipant(
     participants,
     req.task.owner
   )
 
+  await req.task.validate()
   next()
+  createInviteNotification(req.task._id, participants)
 }
 
 exports.updateTask = async (req, res, next) => {
@@ -116,16 +117,8 @@ exports.updateTask = async (req, res, next) => {
 
   req.task.participants.push(...validParticipants)
   await req.task.validate()
-
-  validParticipants.forEach(({ user }) => {
-    Notification.create({
-      user,
-      task: req.task._id,
-      type: 'task-invite',
-    }).catch(() => {})
-  })
-
   next()
+  createInviteNotification(req.task._id, validParticipants)
 }
 
 exports.completeTask = async (req, res, next) => {
