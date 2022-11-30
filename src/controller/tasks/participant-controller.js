@@ -1,6 +1,5 @@
 const Notification = require('../../model/notification-model')
 const socketStore = require('../socket-store')
-const { saveAndGetTask } = require('./utils')
 const coreUtils = require('../../core/utils')
 
 const getParticipant = (req, userId, throwErrorAtNull = true) => {

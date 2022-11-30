@@ -52,7 +52,12 @@ router.patch(
 )
 
 // Task Participant CRUD
-router.use(taskController.setTaskFromAllUsers)
+
+// Do not remove '/:taskId' again....
+// পায়ে পড়ি এমনটা আবার করিস না।
+// Please....
+router.use('/:taskId', taskController.setTaskFromAllUsers)
+
 router.post(
   '/:taskId/invitation-accept',
   participantController.acceptUser,

@@ -1,6 +1,5 @@
 const Task = require('../../model/task-model')
 const TaskCollection = require('../../model/task-collection-model')
-const Notification = require('../../model/notification-model')
 const taskFactory = require('./task-factory')
 const {
   populateParticipants,

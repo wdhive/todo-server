@@ -70,14 +70,14 @@ taskSchema.post('remove', function () {
   ]).catch(() => {})
 })
 
-const getParticipantsFactory = isActive =>
+const getParticipantsFactory = (isActive) =>
   function () {
     const filteredParticipants = this.participants.filter(
-      user => user.active === isActive
+      (user) => user.active === isActive
     )
 
     const participants = filteredParticipants.map(
-      user => user.user?._id?.toString() || user.user?.toString()
+      (user) => user.user?._id?.toString() || user.user?.toString()
     )
 
     const mixedArray = [
@@ -91,7 +91,7 @@ const getParticipantsFactory = isActive =>
 taskSchema.methods.getActiveParticipants = getParticipantsFactory(true)
 taskSchema.methods.getInactiveParticipants = getParticipantsFactory(false)
 
-const hasPermission = roles => {
+const hasPermission = (roles) => {
   return function (user) {
     const userId = user._id.toString()
     if (this.owner.toString() === userId) return true
