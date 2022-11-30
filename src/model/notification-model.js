@@ -23,6 +23,11 @@ const notificationSchema = mongoose.Schema(
       required: true,
       default: 'others',
     },
+    createdAt: {
+      type: Date,
+      required: true,
+      default: () => new Date(),
+    },
   },
   { versionKey: false }
 )

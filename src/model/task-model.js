@@ -56,6 +56,11 @@ const taskSchema = mongoose.Schema(
     endingDate: {
       type: Date,
     },
+    createdAt: {
+      type: Date,
+      required: true,
+      default: () => new Date(),
+    },
     participants: [participantSchema],
   },
   { versionKey: false }
