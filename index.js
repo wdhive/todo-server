@@ -10,9 +10,9 @@ console.log(
   )
 )
 
+require('dotenv').config()
 if (process.argv.at(-1) === '--NODE_ENV=development') {
   console.clear()
-  require('dotenv').config()
   process.env.NODE_ENV = 'development'
 } else process.env.NODE_ENV ||= 'production'
 
