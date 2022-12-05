@@ -1,4 +1,6 @@
 const express = require('express')
+const { catchError } = require('req-error')
+
 const router = express.Router()
 const [
   accountController,
@@ -6,7 +8,7 @@ const [
   participantController,
   taskSearchHandler,
   collectionController,
-] = ReqError.catch(
+] = catchError(
   require('../controller/account/account-controller'),
   require('../controller/tasks/task-controller'),
   require('../controller/tasks/participant-controller'),

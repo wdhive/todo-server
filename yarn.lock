@@ -1953,6 +1953,11 @@ readable-stream@^3.6.0:
     string_decoder "^1.1.1"
     util-deprecate "^1.0.1"
 
+req-error@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/req-error/-/req-error-1.0.3.tgz#4c5a3dc0d6e2f9eb217c98395def394a9b173296"
+  integrity sha512-FICrp2m8ld179f1qw8wVJz+ijfG3i9I9GP//MucxmnVwJ6QypiI9PnSPzmdwSVprnuMUr85snIea+UA0jvHQFg==
+
 rimraf@^3.0.2:
   version "3.0.2"
   resolved "https://registry.yarnpkg.com/rimraf/-/rimraf-3.0.2.tgz#f1a5402ba6220ad52cc1282bac1ae3aa49fd061a"

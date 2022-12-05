@@ -1,6 +1,8 @@
 const express = require('express')
+const { catchError } = require('req-error')
+
 const router = express.Router()
-const extraController = ReqError.catch(
+const extraController = catchError(
   require('../controller/extra-things-controller')
 )
 

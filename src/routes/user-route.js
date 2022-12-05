@@ -1,4 +1,6 @@
 const express = require('express')
+const { catchError } = require('req-error')
+
 const file = require('../file')
 const router = express.Router()
 
@@ -7,7 +9,7 @@ const [
   userController,
   settingsController,
   usersSearchHandler,
-] = ReqError.catch(
+] = catchError(
   require('../controller/account/account-controller'),
   require('../controller/user/user-controller'),
   require('../controller/user/settings-controller'),
