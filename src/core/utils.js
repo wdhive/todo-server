@@ -1,5 +1,4 @@
 const colors = require('colors/safe')
-const errorHandler = require('./error-handler')
 
 const getFail = (message, statusCode) => {
   return {
@@ -8,7 +7,7 @@ const getFail = (message, statusCode) => {
   }
 }
 
-const getSuccess = data => {
+const getSuccess = (data) => {
   return {
     status: 'success',
     data,
@@ -18,36 +17,10 @@ const getSuccess = data => {
 exports.getFail = getFail
 exports.getSuccess = getSuccess
 
-const isResponseInvalid = res => {
+const isResponseInvalid = (res) => {
   if (res.headersSent) {
     return console.warn(colors.red('!!!', 'Headers already sent')), true
   }
-}
-
-const getErrorResponseProd = data => data
-const getErrorResponseDev = (data, err) => ({
-  ...data,
-  error: err,
-  stack: err.stack,
-})
-
-const getErrorResponse =
-  process.env.NODE_ENV === 'development'
-    ? getErrorResponseDev
-    : getErrorResponseProd
-
-exports.errorHandler = (err, req, res, next) => {
-  if (isResponseInvalid(res)) return
-
-  const [message, code] = errorHandler(err, res)
-  const jSendData = getFail(message, code)
-  res.status(code).json(getErrorResponse(jSendData, err))
-  return jSendData
-}
-
-exports.notFound = (req, res) => {
-  const code = 404
-  res.status(code).json(getFail("Oops, looks like you're lost in space!", code))
 }
 
 exports.ping = (req, res) => res.status(200).json({ message: 'Hello, world!' })
@@ -66,11 +39,11 @@ exports.success = function (data, code = 200) {
 
 exports.getBody = function (fields) {
   if (typeof fields === 'string') {
-    fields = fields.split(' ').filter(feild => feild.trim())
+    fields = fields.split(' ').filter((feild) => feild.trim())
   }
 
   const newObj = {}
-  fields.forEach(feild => {
+  fields.forEach((feild) => {
     const value = this.body[feild]
     if (value !== undefined) newObj[feild] = value
   })

@@ -4,6 +4,7 @@ const xss = require('xss-clean')
 const helmet = require('helmet')
 const rateLimit = require('express-rate-limit')
 const mongoSanitize = require('express-mongo-sanitize')
+const { handleError } = require('req-error')
 const coreUtils = require('./core/utils')
 const router = require('./router')
 
@@ -29,7 +30,6 @@ app.response.success = coreUtils.success
 app.request.getBody = coreUtils.getBody
 
 app.use(router)
-app.use(coreUtils.notFound)
-app.use(coreUtils.errorHandler)
+handleError(app)
 
 module.exports = app
