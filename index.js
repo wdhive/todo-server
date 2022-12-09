@@ -17,7 +17,7 @@ if (process.argv.at(-1) === '--NODE_ENV=development') {
 } else process.env.NODE_ENV ||= 'production'
 
 process.env.PORT ||= 8000
-require('./src/core')
+require('req-error/global')
 
 const io = require('./src/socket')
 const server = require('./src/server')
