@@ -1,8 +1,6 @@
-const express = require('express')
+const router = require('express').Router()
 const { catchError } = require('req-error')
-
 const file = require('../file')
-const router = express.Router()
 
 const [
   accountController,

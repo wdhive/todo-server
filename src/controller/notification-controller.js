@@ -1,8 +1,16 @@
 const Notification = require('../model/notification-model')
 
+exports.getAll = async (req, res) => {
+  const notifications = await Notification.find({
+    user: req.user._id,
+  })
+
+  res.success({ notifications }, 200)
+}
+
 exports.clearOne = async (req, res) => {
   await Notification.deleteOne({
-    _id: req.params.notiId,
+    _id: req.params.id,
     user: req.user._id,
   })
 
