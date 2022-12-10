@@ -10,7 +10,10 @@ const rootDir = fs.readdirSync(rootDirPath)
 fs.existsSync(outputDir) && fs.rmSync(outputDir, { recursive: true })
 fs.mkdirSync(outputDir)
 
-fs.writeFileSync(path.join(outputDir, './README.md'), fs.readFileSync(path.resolve('./DOCS.md'), 'utf-8'))
+fs.writeFileSync(
+  path.join(outputDir, './README.md'),
+  fs.readFileSync(path.resolve('./DOCS.md'), 'utf-8')
+)
 
 rootDir.forEach((item) => {
   const itemPath = rootDirPath + '/' + item

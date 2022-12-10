@@ -42,11 +42,10 @@ exports.deleteTaskCollection = async (req, res) => {
   res.success(null, 204)
 }
 
-exports.changeTheme = async (req, res) => {
-  const themeBody = req.getBody('theme hue')
-  const newSettings = await req.user_settings.set(themeBody).save()
+exports.updateSettings = async (req, res) => {
+  const settingsBody = req.getBody('theme hue')
+  const newSettings = await req.user_settings.set(settingsBody).save()
   res.success({
-    theme: newSettings.theme,
-    hue: newSettings.hue,
+    settings: newSettings,
   })
 }

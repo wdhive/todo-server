@@ -39,7 +39,7 @@ router
   .delete(settingsController.deleteTaskCollection)
 
 router
-  .route('/change-theme')
-  .patch(settingsController.setSettings, settingsController.changeTheme)
+  .route('/settings')
+  .patch(settingsController.setSettings, settingsController.updateSettings)
 
 module.exports = router

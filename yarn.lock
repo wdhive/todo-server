@@ -1949,10 +1949,10 @@ readable-stream@^3.6.0:
     string_decoder "^1.1.1"
     util-deprecate "^1.0.1"
 
-req-error@^1.0.11:
-  version "1.0.11"
-  resolved "https://registry.yarnpkg.com/req-error/-/req-error-1.0.11.tgz#5550e0ace5814a9a6c644da67f7377a2129225b8"
-  integrity sha512-kX3o8JOgZlmhXcGDkxJMwoivaIjzfxMMTXrTkTVP8GDTkq3REBMUKC9RikCiLzd9tjSUbQ7RG5Kk6iSLqDCTKw==
+req-error@^1.0.13:
+  version "1.0.13"
+  resolved "https://registry.yarnpkg.com/req-error/-/req-error-1.0.13.tgz#f17c40d40bad751653d4d1111d644126ce32b592"
+  integrity sha512-dhjVH4ob8/oXVflcRE5DMvKwnPc5fVhlWR2I6Av95J+HVB/9EzUOog1PLHhuNMupK4gMWziNC+U/RyznJ60uaQ==
 
 rimraf@^3.0.2:
   version "3.0.2"

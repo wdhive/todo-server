@@ -52,10 +52,10 @@ DELETE /user
 
 ## 
 
-### Change Theme
+### Update settings
 
 ```http
-PATCH /user/change-theme
+PATCH /user/settings
 ```
 
 |Body|Type|Description|

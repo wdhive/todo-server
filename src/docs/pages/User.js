@@ -24,7 +24,7 @@ exports.content = [
     },
   }),
 
-  div('Change Theme', 'patch', '/user/change-theme', {
+  div('Update settings', 'patch', '/user/settings', {
     body: {
       theme: [String, 'Light/Dark'],
       hue: [Number, 'between 0-360'],

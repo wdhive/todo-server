@@ -1,6 +1,6 @@
 const User = require('../../model/user-model')
 
-exports.usersExists = async userIds => {
+exports.usersExists = async (userIds) => {
   const uniqueUserIds = [...new Set(userIds)]
   const usersCount = await User.find({ _id: uniqueUserIds }).countDocuments()
   return uniqueUserIds.length === usersCount
