@@ -1,5 +1,11 @@
 const router = require('express').Router()
-const notificationController = require('../controller/notification-controller')
+const { catchError } = require('req-error')
+const [notificationController, accountController] = catchError(
+  require('../controller/notification-controller'),
+  require('../controller/account/account-controller')
+)
+
+router.use(accountController.checkAuth)
 
 router
   .get('/', notificationController.getAll)
