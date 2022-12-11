@@ -8,7 +8,8 @@ exports.createInviteNotification = (task, participants) => {
   participants.forEach(({ user }) => {
     Notification.create({
       user,
-      task,
+      task: task._id,
+      createdBy: task.owner,
       type: 'task-invite',
     }).catch(() => {})
   })

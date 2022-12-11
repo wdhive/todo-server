@@ -47,6 +47,7 @@ exports.acceptUser = async (req, res, next) => {
     task: req.task._id,
     user: req.task.owner,
     type: 'task-invite-accept',
+    createdBy: req.user._id,
   })
   await Notification.deleteMany({
     task: req.task._id,

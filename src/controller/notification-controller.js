@@ -1,8 +1,12 @@
+const { USER_PUBLIC_INFO } = require('../config/config')
 const Notification = require('../model/notification-model')
 
 exports.getAll = async (req, res) => {
   const notifications = await Notification.find({
     user: req.user._id,
+  }).populate({
+    path: 'createdBy',
+    select: USER_PUBLIC_INFO,
   })
 
   res.success({ notifications }, 200)

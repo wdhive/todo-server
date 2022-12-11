@@ -88,7 +88,7 @@ exports.createTask = async (req, res, next) => {
 
   await req.task.validate()
   next()
-  createInviteNotification(req.task._id, participants)
+  createInviteNotification(req.task, participants)
 }
 
 exports.updateTask = async (req, res, next) => {
@@ -117,7 +117,7 @@ exports.updateTask = async (req, res, next) => {
   req.task.participants.push(...validParticipants)
   await req.task.validate()
   next()
-  createInviteNotification(req.task._id, validParticipants)
+  createInviteNotification(req.task, validParticipants)
 }
 
 exports.completeTask = async (req, res, next) => {
