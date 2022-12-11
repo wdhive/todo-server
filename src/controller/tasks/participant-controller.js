@@ -2,11 +2,11 @@ const Notification = require('../../model/notification-model')
 const socketStore = require('../socket-store')
 const coreUtils = require('../../core/utils')
 
-const getParticipant = (req, userId, throwErrorAtNull = true) => {
-  const participant = req.task.participants.find(({ user }) => {
+const getParticipant = (task, userId) => {
+  const participant = task.participants.find(({ user }) => {
     return user.toString() === userId.toString()
   })
-  if (throwErrorAtNull && !participant) {
+  if (!participant) {
     throw new ReqError('Participant does not exists')
   }
 
@@ -14,7 +14,7 @@ const getParticipant = (req, userId, throwErrorAtNull = true) => {
 }
 
 exports.removeUser = async (req, res, next) => {
-  const participant = getParticipant(req, req.params.userId)
+  const participant = getParticipant(req.task, req.params.userId)
   participant.remove()
   next()
 
@@ -32,14 +32,27 @@ exports.removeUser = async (req, res, next) => {
 
 exports.changeRole = async (req, res, next) => {
   const roleBody = req.getBody('role')
-  const participant = getParticipant(req, req.params.userId)
+  const participant = getParticipant(req.task, req.params.userId)
   participant.set(roleBody)
   next()
 }
 
 exports.acceptUser = async (req, res, next) => {
-  const participant = getParticipant(req, req.user._id)
+  const participant = getParticipant(req.task, req.user._id)
   if (participant.active) throw new ReqError('You are already in')
   participant.set({ active: true })
+
+  await req.task.validate()
+  await Notification.create({
+    task: req.task._id,
+    user: req.task.owner,
+    type: 'task-invite-accept',
+  })
+  await Notification.deleteMany({
+    task: req.task._id,
+    user: req.user._id,
+    type: 'task-invite',
+  })
+
   next()
 }
