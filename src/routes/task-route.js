@@ -59,11 +59,10 @@ router.patch(
 // Please....
 router.use('/:taskId/*', taskController.setTaskFromAllUsers)
 
-router.post(
-  '/:taskId/invitation-accept',
-  participantController.acceptUser,
-  taskController.saveAndSendTask
-)
+router
+  .route('/:taskId/invitation')
+  .post(participantController.acceptUser, taskController.saveAndSendTask)
+  .delete(participantController.leftUser, taskController.saveAndSendTask)
 
 router.use(taskController.onlyForOwner)
 router

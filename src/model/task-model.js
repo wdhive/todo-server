@@ -1,4 +1,6 @@
 const mongoose = require('mongoose')
+const socketStore = require('../controller/socket-store')
+const { getSuccess } = require('../core/utils')
 const Notification = require('./notification-model')
 const TaskCollection = require('./task-collection-model')
 
@@ -68,11 +70,31 @@ const taskSchema = mongoose.Schema(
 
 taskSchema.index({ owner: 1 })
 
-taskSchema.post('remove', function () {
-  Promise.all([
-    TaskCollection.deleteMany({ task: this._id }),
-    Notification.deleteMany({ task: this._id }),
+const postTaskDelete = async (task) => {
+  const [notis] = await Promise.all([
+    Notification.find({
+      task: task._id,
+      type: 'task-invitation',
+    }).select('user'),
+    TaskCollection.deleteMany({
+      task: task._id,
+    }),
   ]).catch(() => {})
+
+  await Promise.all(notis.map((n) => n.delete()))
+  notis.forEach((n) =>
+    socketStore.send(
+      n.user,
+      socketStore.events.notification.delete,
+      getSuccess({
+        notification: n._id,
+      })
+    )
+  )
+}
+
+taskSchema.post('remove', function () {
+  postTaskDelete(this)
 })
 
 const getParticipantsFactory = (isActive) =>

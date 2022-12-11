@@ -10,7 +10,7 @@ exports.createInviteNotification = (task, participants) => {
       user,
       task: task._id,
       createdBy: task.owner,
-      type: 'task-invite',
+      type: 'task-invitation',
     }).catch(() => {})
   })
 }
@@ -101,4 +101,15 @@ exports.saveAndGetTask = async (req) => {
 exports.isTaskExists = async (taskId, userId) => {
   const filter = getUsersTaskFilter(taskId, userId, true)
   return Task.exists(filter)
+}
+
+exports.getParticipant = (task, userId) => {
+  const participant = task.participants.find(({ user }) => {
+    return user.toString() === userId.toString()
+  })
+  if (!participant) {
+    throw new ReqError('Participant does not exists')
+  }
+
+  return participant
 }

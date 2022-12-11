@@ -30,9 +30,9 @@ exports.reqBody = (req, res, next) => {
 }
 
 exports.success = function (data, code = 200) {
-  if (isResponseInvalid(this)) return
-
   const jSendData = getSuccess(data)
+  if (isResponseInvalid(this)) return jSendData
+
   this.status(code).json(code === 204 ? null : jSendData)
   return jSendData
 }

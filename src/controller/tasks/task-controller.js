@@ -92,10 +92,10 @@ exports.createTask = async (req, res, next) => {
 }
 
 exports.updateTask = async (req, res, next) => {
-  let taskBody = req.getBody('title description startingDate endingDate')
   if (!req.task.isModerator(req.user)) {
     throw new ReqError('You do not have permission to update this task')
   }
+  let taskBody = req.getBody('title description startingDate endingDate')
   req.task.set(taskBody)
 
   const participants = req.body.participants

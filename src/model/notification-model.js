@@ -21,14 +21,14 @@ const notificationSchema = mongoose.Schema(
     type: {
       type: String,
       enum: [
-        'task-invite',
-        'task-invite-accept',
-        'task-participant-remove',
-        'task-participant-promotion',
-        'others',
+        'task-invitation',
+        'task-invitation-accepted',
+        'task-invitation-denied',
+        'task-particiapnt-removed',
+
+        // 'task-particiapnt-left',
       ],
       required: true,
-      default: 'others',
     },
     createdAt: {
       type: Date,
@@ -48,17 +48,12 @@ const sendInvition = async (noti) => {
     path: 'createdBy',
     select: USER_PUBLIC_INFO,
   })
-  socketStore.send(
-    noti.user,
-    socketStore.events.task.invite,
-    coreUtils.getSuccess({ notification })
-  )
+
+  socketStore.send(noti.user, noti.type, coreUtils.getSuccess({ notification }))
 }
 
 notificationSchema.post('save', function () {
-  if (this.postIsNew && this.type === 'task-invite') {
-    sendInvition(this)
-  }
+  if (this.postIsNew) sendInvition(this)
 })
 
 const Notification = mongoose.model('notification', notificationSchema)

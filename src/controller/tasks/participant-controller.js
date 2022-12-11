@@ -1,33 +1,34 @@
 const Notification = require('../../model/notification-model')
 const socketStore = require('../socket-store')
 const coreUtils = require('../../core/utils')
-
-const getParticipant = (task, userId) => {
-  const participant = task.participants.find(({ user }) => {
-    return user.toString() === userId.toString()
-  })
-  if (!participant) {
-    throw new ReqError('Participant does not exists')
-  }
-
-  return participant
-}
+const { getParticipant } = require('./utils')
 
 exports.removeUser = async (req, res, next) => {
   const participant = getParticipant(req.task, req.params.userId)
   participant.remove()
   next()
 
-  await Notification.deleteMany({
+  const foundNoti = await Notification.findOne({
     task: req.task._id,
     user: req.params.userId,
+    type: 'task-invitation',
   })
 
-  socketStore.send(
-    req.params.userId,
-    socketStore.events.task.participantDelete,
-    coreUtils.getSuccess({ task: req.task._id })
-  )
+  if (foundNoti) {
+    await foundNoti.delete()
+    socketStore.send(
+      req.params.userId,
+      socketStore.events.notification.delete,
+      coreUtils.getSuccess({ notification: foundNoti._id })
+    )
+  }
+
+  await Notification.create({
+    task: req.task._id,
+    user: req.params.userId,
+    createdBy: req.task.owner,
+    type: 'task-particiapnt-removed',
+  })
 }
 
 exports.changeRole = async (req, res, next) => {
@@ -46,14 +47,18 @@ exports.acceptUser = async (req, res, next) => {
   await Notification.create({
     task: req.task._id,
     user: req.task.owner,
-    type: 'task-invite-accept',
+    type: 'task-invitation-accepted',
     createdBy: req.user._id,
   })
   await Notification.deleteMany({
     task: req.task._id,
     user: req.user._id,
-    type: 'task-invite',
+    type: 'task-invitation',
   })
 
   next()
+}
+
+exports.leftUser = async (req, res, next) => {
+  throw new ReqError('This feature still not implemented')
 }

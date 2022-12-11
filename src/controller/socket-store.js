@@ -9,9 +9,9 @@ class SocketStore {
     task: {
       update: 'task-update',
       delete: 'task-delete',
-      invite: 'task-invitation',
-      participantDelete: 'task-participant-delete',
-      accept: 'task-invitation-accept',
+    },
+    notification: {
+      delete: 'notification-delete',
     },
   }
 
