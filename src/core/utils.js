@@ -17,12 +17,6 @@ const getSuccess = (data) => {
 exports.getFail = getFail
 exports.getSuccess = getSuccess
 
-const isResponseInvalid = (res) => {
-  if (res.headersSent) {
-    return console.warn(colors.red('!!!', 'Headers already sent')), true
-  }
-}
-
 exports.ping = (req, res) => res.status(200).json({ message: 'Hello, world!' })
 exports.reqBody = (req, res, next) => {
   if (req.body == null) req.body = {}
@@ -31,9 +25,13 @@ exports.reqBody = (req, res, next) => {
 
 exports.success = function (data, code = 200) {
   const jSendData = getSuccess(data)
-  if (isResponseInvalid(this)) return jSendData
 
-  this.status(code).json(code === 204 ? null : jSendData)
+  if (!this.headersSent) {
+    this.status(code).json(code === 204 ? null : jSendData)
+  } else {
+    console.warn(colors.red('!!!', 'Headers already sent'))
+  }
+
   return jSendData
 }
 

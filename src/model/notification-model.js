@@ -25,8 +25,7 @@ const notificationSchema = mongoose.Schema(
         'task-invitation-accepted',
         'task-invitation-denied',
         'task-particiapnt-removed',
-
-        // 'task-particiapnt-left',
+        'task-particiapnt-left',
       ],
       required: true,
     },

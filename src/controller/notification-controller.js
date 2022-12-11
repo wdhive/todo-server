@@ -1,8 +1,6 @@
 const { USER_PUBLIC_INFO } = require('../config/config')
-const { getSuccess } = require('../core/utils')
 const Notification = require('../model/notification-model')
 const Task = require('../model/task-model')
-const socketStore = require('./socket-store')
 const { getParticipant } = require('./tasks/utils')
 
 exports.getAll = async (req, res) => {
@@ -16,7 +14,7 @@ exports.getAll = async (req, res) => {
   res.success({ notifications }, 200)
 }
 
-exports.clearOne = async (req, res) => {
+exports.clearOne = async (req, res, next) => {
   const noti = await Notification.findOne({
     _id: req.params.id,
     user: req.user._id,
@@ -36,15 +34,18 @@ exports.clearOne = async (req, res) => {
   }
 
   participant.remove()
-  await Promise.all([noti.delete(), task.save()])
-  await Notification.create({
-    type: 'task-invitation-denied',
-    task: task._id,
-    user: task.owner,
-    createdBy: req.user._id,
-  })
+  await Promise.all([
+    noti.delete(),
+    Notification.create({
+      type: 'task-invitation-denied',
+      task: task._id,
+      user: task.owner,
+      createdBy: req.user._id,
+    }),
+  ])
 
-  res.success(null, 204)
+  req.task = task
+  next()
 }
 
 exports.clearAll = async (req, res) => {

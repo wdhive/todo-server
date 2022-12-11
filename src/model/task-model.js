@@ -13,7 +13,7 @@ const participantSchema = mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ['admin', 'moderator', 'assigner'],
+      enum: ['admin', 'assigner'],
       default: 'assigner',
       required: true,
     },
@@ -132,12 +132,7 @@ taskSchema.methods.isOwner = function (userId) {
   return this.owner.toString() === userId.toString()
 }
 taskSchema.methods.isAdmin = hasPermission(['admin'])
-taskSchema.methods.isModerator = hasPermission(['admin', 'moderator'])
-taskSchema.methods.isAssigner = hasPermission([
-  'admin',
-  'moderator',
-  'assigner',
-])
+taskSchema.methods.isAssigner = hasPermission(['admin', 'assigner'])
 
 const taskModel = mongoose.model('task', taskSchema)
 module.exports = taskModel

@@ -31,7 +31,7 @@ router
 router
   .route('/:taskId')
   .all(taskController.setTaskFromActiveUsers)
-  .delete(taskController.deleteTask)
+  .delete(taskController.onlyForOwner, taskController.deleteTask)
   .patch(
     taskController.updateTask,
     collectionController.updateTaskCollection,
@@ -65,6 +65,7 @@ router
   .delete(participantController.leftUser, taskController.saveAndSendTask)
 
 router.use(taskController.onlyForOwner)
+
 router
   .route('/:taskId/participants/:userId')
   .delete(participantController.removeUser, taskController.saveAndSendTask)

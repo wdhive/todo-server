@@ -41,20 +41,19 @@ exports.onlyForAssigner = (req, res, next) => {
 
 exports.saveAndSendTask = async (req, res) => {
   const task = await saveAndGetTask(req)
-  const data = res.success({ task })
+  const data = res.success({ task: task.toObject() })
 
+  delete data.data.task.collection
   socketStore.send(req, socketStore.events.task.update, data, {
     rooms: task.getActiveParticipants(),
   })
 }
 
 exports.getAllTask = async (req, res) => {
-  const queryScript = getUsersAllTaskFilter(req.user._id)
+  const filter = getUsersAllTaskFilter(req.user._id)
 
-  const totalTasks = await Task.find(queryScript).countDocuments()
-  const tasks = await Task.find(queryScript)
-    .lean()
-    .populate(populateParticipants)
+  const totalTasks = await Task.find(filter).countDocuments()
+  const tasks = await Task.find(filter).lean().populate(populateParticipants)
 
   const collectionsArray = await TaskCollection.find({
     user: req.user._id,
@@ -92,9 +91,8 @@ exports.createTask = async (req, res, next) => {
 }
 
 exports.updateTask = async (req, res, next) => {
-  if (!req.task.isModerator(req.user)) {
-    throw new ReqError('You do not have permission to update this task')
-  }
+  if (!req.task.isAdmin(req.user)) return next()
+
   let taskBody = req.getBody('title description startingDate endingDate')
   req.task.set(taskBody)
 
@@ -133,9 +131,6 @@ exports.unCompleteTask = async (req, res, next) => {
 }
 
 exports.deleteTask = async (req, res) => {
-  if (!req.task.isAdmin(req.user)) {
-    throw new ReqError('You do not have permission to delete this task')
-  }
   await req.task.delete()
 
   socketStore.send(

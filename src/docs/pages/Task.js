@@ -37,7 +37,7 @@ exports.content = [
     '/tasks/{task_id}/participants/{user}',
     {
       body: {
-        role$: [String, 'admin | moderator | assigner'],
+        role$: [String, 'admin | assigner'],
       },
     }
   ),

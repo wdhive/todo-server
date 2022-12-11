@@ -30,16 +30,22 @@ exports.populateParticipants = [
 ]
 
 exports.getUsersAllTaskFilter = (userId, active = true) => {
-  return {
+  const filter = {
     $or: [
       { owner: userId },
       {
         participants: {
-          $elemMatch: { user: userId, active },
+          $elemMatch: { user: userId },
         },
       },
     ],
   }
+
+  if (active) {
+    filter.$or[1].participants.$elemMatch.active = true
+  }
+
+  return filter
 }
 
 const getUsersTaskFilter = (taskId, ...args) => {
