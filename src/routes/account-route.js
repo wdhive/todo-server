@@ -39,7 +39,11 @@ router.use(
   accountController.checkPassAfterLoggedIn
 )
 
-router.patch('/change-password', accountController.changePassword)
+router.patch(
+  '/change-password',
+  accountController.changePassword,
+  accountController.sendJwt
+)
 router.patch('/change-username', accountController.changeUsername)
 router.patch(
   '/change-email',

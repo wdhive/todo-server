@@ -18,7 +18,7 @@ exports.checkAuth = async (req, res, next) => {
 
 exports.checkPassAfterLoggedIn = async (req, res, next) => {
   const ok = await req.user.checkPassword(req.body.password)
-  if (!ok) throw new ReqError(errorMessages.password.wrong)
+  if (!ok) throw new ReqError(errorMessages.password.wrong, 400)
   next()
 }
 
