@@ -86,5 +86,5 @@ PATCH /tasks/{task_id}/participants/{user}
 
 |Body|Type|Description|
 | :-------- | :------- | :------- |
-| `role`* | `string` | admin \| moderator \| assigner |
+| `role`* | `string` | admin \| assigner |
 

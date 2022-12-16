@@ -18,7 +18,7 @@ exports.content = [
     },
   }),
 
-  div('Delete User', 'delete', '/user', {
+  div('Delete User', 'patch', '/user/delete-me', {
     body: {
       password$: String,
     },

@@ -27,4 +27,3 @@
 
 ### `task-participant-delete` When someone removes you from a task
 
-### `task-invitation-accept` When someone accepts your invitation to join a task

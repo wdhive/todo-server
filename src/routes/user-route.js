@@ -22,7 +22,13 @@ router
   .route('/')
   .get(userController.getUser)
   .patch(file.fileMiddleware, userController.updateUser)
-  .delete(accountController.checkPassAfterLoggedIn, userController.deleteUser)
+
+// Not using delete method because of I need confirmation password :(
+router.patch(
+  '/delete-me',
+  accountController.checkPassAfterLoggedIn,
+  userController.deleteUser
+)
 
 router.get('/search', usersSearchHandler)
 

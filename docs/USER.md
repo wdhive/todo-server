@@ -43,7 +43,7 @@ PATCH /user
 ### Delete User
 
 ```http
-DELETE /user
+PATCH /user/delete-me
 ```
 
 |Body|Type|Description|
