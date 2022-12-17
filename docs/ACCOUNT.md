@@ -48,6 +48,14 @@ POST /account/login
 
 ## 
 
+### Get a new JWT token
+
+```http
+GET /account/new-token
+```
+
+## 
+
 ### Forget Password
 
 ```http

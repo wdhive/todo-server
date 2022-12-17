@@ -33,11 +33,13 @@ router.post(
   accountController.sendJwt
 )
 
+// Check Auth
+router.use(accountController.checkAuth)
+
+router.get('/new-token', accountController.sendJwt)
+
 // Now every request needs to be logged in and put his 'password' into the body
-router.use(
-  accountController.checkAuth,
-  accountController.checkPassAfterLoggedIn
-)
+router.use(accountController.checkPassAfterLoggedIn)
 
 router.patch(
   '/change-password',

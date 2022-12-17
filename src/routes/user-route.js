@@ -16,8 +16,6 @@ const [
 
 router.use(accountController.checkAuth)
 
-router.get('/new-token', accountController.sendJwt)
-
 router
   .route('/')
   .get(userController.getUser)

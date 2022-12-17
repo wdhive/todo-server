@@ -81,7 +81,7 @@ POST /user/collections
 ### Update Task Collection
 
 ```http
-PATCH /user/collections/{collectionId}
+PATCH /user/collections/:collectionId
 ```
 
 |Body|Type|Description|
@@ -94,6 +94,6 @@ PATCH /user/collections/{collectionId}
 ### Delete Task Collection
 
 ```http
-DELETE /user/collections/{collectionId}
+DELETE /user/collections/:collectionId
 ```
 

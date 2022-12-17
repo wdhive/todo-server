@@ -27,13 +27,14 @@ POST /tasks
 | `startingDate` | `date` | ... |
 | `endingDate` | `date` | ... |
 | `participants` | `array` | ... |
+| `collection` | `string` | ... |
 
 ## 
 
 ### Update Task
 
 ```http
-PATCH /tasks/{task_id}
+PATCH /tasks/:taskId
 ```
 
 |Body|Type|Description|
@@ -43,13 +44,14 @@ PATCH /tasks/{task_id}
 | `startingDate` | `date` | ... |
 | `endingDate` | `date` | ... |
 | `participants` | `array` | ... |
+| `collection` | `string` | ... |
 
 ## 
 
 ### Delete Task
 
 ```http
-DELETE /tasks/{task_id}
+DELETE /tasks/:taskId
 ```
 
 ## 
@@ -57,7 +59,7 @@ DELETE /tasks/{task_id}
 ### Complete Task
 
 ```http
-PATCH /tasks/{task_id}/complete
+PATCH /tasks/:taskId/complete
 ```
 
 ## 
@@ -65,7 +67,7 @@ PATCH /tasks/{task_id}/complete
 ### Uncomplete Task
 
 ```http
-PATCH /tasks/{task_id}/uncomplete
+PATCH /tasks/:taskId/uncomplete
 ```
 
 ## 
@@ -73,7 +75,7 @@ PATCH /tasks/{task_id}/uncomplete
 ### Remove Participant
 
 ```http
-DELETE /tasks/{task_id}/participants/{user}
+DELETE /tasks/:taskId/participants/{user}
 ```
 
 ## 
@@ -81,7 +83,7 @@ DELETE /tasks/{task_id}/participants/{user}
 ### Change Participant Role
 
 ```http
-PATCH /tasks/{task_id}/participants/{user}
+PATCH /tasks/:taskId/participants/:userId
 ```
 
 |Body|Type|Description|

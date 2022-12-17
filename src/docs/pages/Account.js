@@ -31,6 +31,8 @@ exports.content = [
     },
   }),
 
+  div('Get a new JWT token', 'get', '/account/new-token'),
+
   div('Forget Password', 'post', '/account/password-forget', {
     body: {
       login$: [String, 'login should contain `email` or `username`'],

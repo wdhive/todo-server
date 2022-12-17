@@ -11,30 +11,32 @@ exports.content = [
       startingDate: Date,
       endingDate: Date,
       participants: Array,
+      collection: String,
     },
   }),
 
-  div('Update Task', 'patch', '/tasks/{task_id}', {
+  div('Update Task', 'patch', '/tasks/:taskId', {
     body: {
       title: String,
       description: String,
       startingDate: Date,
       endingDate: Date,
       participants: Array,
+      collection: String,
     },
   }),
 
-  div('Delete Task', 'delete', '/tasks/{task_id}'),
+  div('Delete Task', 'delete', '/tasks/:taskId'),
 
-  div('Complete Task', 'patch', '/tasks/{task_id}/complete'),
-  div('Uncomplete Task', 'patch', '/tasks/{task_id}/uncomplete'),
+  div('Complete Task', 'patch', '/tasks/:taskId/complete'),
+  div('Uncomplete Task', 'patch', '/tasks/:taskId/uncomplete'),
 
-  div('Remove Participant', 'delete', '/tasks/{task_id}/participants/{user}'),
+  div('Remove Participant', 'delete', '/tasks/:taskId/participants/{user}'),
 
   div(
     'Change Participant Role',
     'patch',
-    '/tasks/{task_id}/participants/{user}',
+    '/tasks/:taskId/participants/:userId',
     {
       body: {
         role$: [String, 'admin | assigner'],

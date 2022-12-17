@@ -38,12 +38,12 @@ exports.content = [
     },
   }),
 
-  div('Update Task Collection', 'patch', '/user/collections/{collectionId}', {
+  div('Update Task Collection', 'patch', '/user/collections/:collectionId', {
     body: {
       name: String,
       hue: [Number, 'between 0-360'],
     },
   }),
 
-  div('Delete Task Collection', 'delete', '/user/collections/{collectionId}'),
+  div('Delete Task Collection', 'delete', '/user/collections/:collectionId'),
 ]
