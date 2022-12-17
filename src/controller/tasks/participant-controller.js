@@ -4,27 +4,27 @@ const coreUtils = require('../../core/utils')
 const { getParticipant } = require('./utils')
 const TaskCollection = require('../../model/task-collection-model')
 
-exports.removeUser = async (req, res, next) => {
-  const participant = getParticipant(req.task, req.params.userId)
-  participant.remove()
-  next()
-
+const deleteInviteNoti = async (taskId, userId) => {
   const foundNoti = await Notification.findOne({
-    task: req.task._id,
-    user: req.params.userId,
+    task: taskId,
+    user: userId,
     type: 'task-invitation',
   })
 
   if (foundNoti) {
     await foundNoti.delete()
-    socketStore.send(
-      req.params.userId,
-      socketStore.events.notification.delete,
-      coreUtils.getSuccess({ notification: foundNoti._id })
-    )
+    return true
   }
 
+  return false
+}
+
+exports.removeUser = async (req, res, next) => {
+  const participant = getParticipant(req.task, req.params.userId)
+  participant.remove()
+
   await Promise.all([
+    deleteInviteNoti(req.task._id, req.params.userId),
     Notification.create({
       task: req.task._id,
       user: req.params.userId,
@@ -37,6 +37,8 @@ exports.removeUser = async (req, res, next) => {
       task: req.task._id,
     }),
   ])
+
+  next()
 }
 
 exports.changeRole = async (req, res, next) => {
@@ -80,10 +82,20 @@ exports.leftUser = async (req, res, next) => {
     createdBy: req.user._id,
     type: 'task-particiapnt-left',
   })
-  await TaskCollection.deleteMany({
-    user: req.user._id,
-    task: req.task._id,
-  })
+
+  await Promise.all([
+    TaskCollection.deleteMany({
+      user: req.user._id,
+      task: req.task._id,
+    }),
+    deleteInviteNoti(req.task._id, req.user._id),
+  ])
+
+  socketStore.send(
+    req,
+    socketStore.events.task.delete,
+    coreUtils.getSuccess({ task: req.task._id }, 204)
+  )
 
   next()
 }

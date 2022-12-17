@@ -12,6 +12,7 @@ class SocketStore {
     },
     notification: {
       delete: 'notification-delete',
+      deleteAll: 'notification-delete-all',
     },
   }
 

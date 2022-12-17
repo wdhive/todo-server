@@ -8,7 +8,6 @@ const notificationSchema = mongoose.Schema(
     user: {
       type: mongoose.Types.ObjectId,
       required: true,
-      select: false,
     },
     createdBy: {
       type: mongoose.Types.ObjectId,
@@ -53,6 +52,14 @@ const sendInvition = async (noti) => {
 
 notificationSchema.post('save', function () {
   if (this.postIsNew) sendInvition(this)
+})
+
+notificationSchema.post('remove', function () {
+  socketStore.send(
+    this.user,
+    socketStore.events.notification.delete,
+    coreUtils.getSuccess({ notification: this._id }, 204)
+  )
 })
 
 const Notification = mongoose.model('notification', notificationSchema)

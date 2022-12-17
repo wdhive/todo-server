@@ -1,6 +1,7 @@
 const { USER_PUBLIC_INFO } = require('../config/config')
 const Notification = require('../model/notification-model')
 const Task = require('../model/task-model')
+const socketStore = require('./socket-store')
 const { getParticipant } = require('./tasks/utils')
 
 exports.getAll = async (req, res) => {
@@ -54,5 +55,11 @@ exports.clearAll = async (req, res) => {
     type: { $not: { $eq: 'task-invitation' } },
   })
 
-  res.success(null, 204)
+  socketStore.send(
+    req,
+    socketStore.events.notification.deleteAll,
+    res.success(null, 204)
+  )
+
+  console.log('Hello')
 }

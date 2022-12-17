@@ -43,11 +43,15 @@ exports.saveAndSendTask = async (req, res) => {
   const task = await saveAndGetTask(req)
   const data = res.success({ task: task.toObject() })
 
-  const activeParticipants = task
-    .getActiveParticipants()
-    .filter((ap) => ap !== req.user._id.toString())
+  let activeParticipants = task.getActiveParticipants()
 
-  socketStore.send(req, socketStore.events.task.update, data)
+  if (activeParticipants.includes(req.user._id.toString())) {
+    activeParticipants = activeParticipants.filter(
+      (ap) => ap !== req.user._id.toString()
+    )
+    socketStore.send(req, socketStore.events.task.update, data)
+  }
+
   delete data.data.task.collection
   socketStore.send(req, socketStore.events.task.update, data, {
     rooms: activeParticipants,
