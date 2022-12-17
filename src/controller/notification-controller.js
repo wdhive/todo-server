@@ -60,6 +60,4 @@ exports.clearAll = async (req, res) => {
     socketStore.events.notification.deleteAll,
     res.success(null, 204)
   )
-
-  console.log('Hello')
 }
