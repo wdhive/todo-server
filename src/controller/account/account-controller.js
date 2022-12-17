@@ -7,8 +7,13 @@ const sendMail = require('../../mail/send-mail')
 const errorMessages = require('../../utils/error-messages')
 const accountFactory = require('./account-factory')
 const jwtToken = require('../../utils/jwt-token')
-const { getFindUserQuery, checkOtpRequest } = require('./utils')
+const {
+  getFindUserQuery,
+  checkOtpRequest,
+  checkIsDisposable,
+} = require('./utils')
 const file = require('../../file')
+const axios = require('axios')
 
 exports.checkAuth = async (req, res, next) => {
   const user = await jwtToken.verifyUser(req.headers.authorization)
@@ -23,12 +28,20 @@ exports.checkPassAfterLoggedIn = async (req, res, next) => {
 }
 
 exports.verifyEmailMail = async (req, res, next) => {
-  const { email } = req.body
+  const email = req.body.email?.trim()
   if (await User.findOne({ email }).countDocuments()) {
     throw new ReqError(errorMessages.email.duplicate)
   }
   req.user = { email }
   req.otpType = 'verify-email'
+
+  const isDis = await axios.get(
+    'https://disposable.debounce.io/?email=' + email
+  )
+  if (isDis.data?.disposable !== 'false' || checkIsDisposable(email)) {
+    throw new ReqError('Please use a non disposable email')
+  }
+
   next()
 }
 

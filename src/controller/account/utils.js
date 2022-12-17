@@ -15,3 +15,9 @@ exports.checkOtpRequest = async (Model, findQuery, code) => {
 
   return otpRequest
 }
+
+const disposableEmailList = ['dni8.com']
+exports.checkIsDisposable = (email) => {
+  const domain = email.split('@')[1]
+  return disposableEmailList.includes(domain)
+}
