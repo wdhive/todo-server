@@ -90,7 +90,7 @@ exports.saveAndGetTask = async (req) => {
 
   let collectionId = req.task_collection?.collectionId
   if (!collectionId) {
-    const collection = await TaskCollection.exists({
+    const collection = await TaskCollection.findOne({
       user: req.user._id,
       task: req.task._id,
     })
@@ -100,7 +100,7 @@ exports.saveAndGetTask = async (req) => {
     collectionId = collection?.collectionId
   }
 
-  populated._doc.collection = collectionId
+  populated._doc.collection = collectionId || null
   return populated
 }
 

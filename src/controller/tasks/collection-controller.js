@@ -3,11 +3,15 @@ const UserSettings = require('../../model/user-settings-model')
 
 exports.updateTaskCollection = async (req, res, next) => {
   const collectionId = req.body.collection
-  if (!collectionId) return next()
+  if (collectionId === undefined) return next()
 
-  await req.task.validate()
-  const userId = req.user._id
-  const taskId = req.task._id
+  const filter = {
+    user: req.user._id,
+    task: req.task._id,
+  }
+
+  await TaskCollection.deleteOne(filter)
+  if (!collectionId) return next()
 
   const isCollectionExists = await UserSettings.exists({
     collections: { $elemMatch: { _id: collectionId } },
@@ -15,13 +19,6 @@ exports.updateTaskCollection = async (req, res, next) => {
   if (!isCollectionExists) {
     throw new ReqError(`Collection does not exists`, 404)
   }
-
-  const filter = {
-    user: userId,
-    task: taskId,
-  }
-
-  await TaskCollection.deleteMany(filter)
   req.task_collection = await TaskCollection.create({
     ...filter,
     collectionId,
