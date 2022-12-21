@@ -31,10 +31,12 @@ const taskSchema = mongoose.Schema(
     title: {
       type: String,
       required: true,
+      maxLength: 100,
     },
     description: {
       type: String,
       required: true,
+      maxLength: 300,
     },
     owner: {
       type: mongoose.Types.ObjectId,
