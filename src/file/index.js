@@ -57,6 +57,6 @@ exports.updateFile = async ({ file }, user) => {
 exports.fileMiddleware = require('multer')({
   dest: tempDir,
   limits: {
-    fileSize: 1000000,
+    fileSize: 2_500_000,
   },
 }).single('avatar')
