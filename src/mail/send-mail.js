@@ -13,14 +13,14 @@ const forgetPassTemplate = readFileSync(
 exports.verifyEmailCode = (to, code) => {
   return mail({
     to,
-    subject: 'Quran account verification code',
+    subject: 'Todo account verification code',
     body: verifyEmailTemplate.replace('{%CODE%}', code),
   })
 }
 exports.forgetPassCode = (to, code) => {
   return mail({
     to,
-    subject: 'Quran account password reset code',
+    subject: 'Todo account password reset code',
     body: forgetPassTemplate.replace('{%CODE%}', code),
   })
 }
